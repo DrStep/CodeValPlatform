@@ -1,6 +1,6 @@
 language :c
-teacher 'answer'
-files 'main'
+teachers_files 'answer'
+students_files 'main'
 test1 2,10,20,30
 test2 93,0,-34,1
 
