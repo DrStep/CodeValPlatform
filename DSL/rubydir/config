@@ -1,8 +1,17 @@
 language :c
+
 teachers_files 'answer'
 students_files 'main'
-test1 2,10,20,30
-test2 93,0,-34,1
 
 time_limit 14.2
 memory_limit 25
+
+test 'first' do |t|
+  t.in 2,10,20,30
+  t.out 2,10,20,30
+end
+
+test 'second' do |t|
+  t.in 93,0,-34,1
+  t.out 93,0,-34,1
+end

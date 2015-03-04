@@ -18,15 +18,14 @@ class DSL
     def initialize
         @test_arr = []
         @teach_cmd = Hash.new
-        @stud_cmd = Hash.new
+        @stud_cmd = {}
+        @test = {}
         readConfig
     end
     
     def readConfig
-		File.readlines('config' ).each do |line|
-  			eval(line)
-		end
-	end
+      eval File.read('config')
+    end
 
     def language lang
     	@lang = ".#{lang}"
@@ -49,6 +48,25 @@ class DSL
     def memory_limit memory_lim
     	@memory_lim = memory_lim
     end
+
+  def test(name, &block)
+    @test[name] = block
+  end
+
+  def in(*args)
+    # @context : stdin, stdout, stderr, wait_thr
+    @context[0].puts(args.join ' ') if args.any?
+  end
+
+  def out(*args)
+    # @context : stdin, stdout, stderr, wait_thr
+    if args.any?
+      result = @context[1].gets
+      expected = args.join ' '
+
+      p result, expected
+    end
+  end
 
     def cmd_create files_arr
         cmd = Hash.new
@@ -73,7 +91,7 @@ class DSL
     	end
     end
 
-end
+
 
 #functions for runing tests
 def run_test cmd, tests
@@ -85,11 +103,18 @@ def run_test cmd, tests
            return compile_result 
         end
     end
-    tests.each do |test|
-        tests_result[i] = run_program cmd[:run], test
-        i += 1
-    end
+#    tests.each do |test|
+#        tests_result[i] = run_program cmd[:run], test
+#        i += 1
+#    end
+  @test.each do |name, block|
+    puts 'test: ' + name
+    @context = *Open3.popen3("#{cmd[:run]} #{tests.join(' ')}")
+    block.call(self)
+    @context[0..2].map(&:close)
+  end
     return tests_result
+end
 end
 
 def compile_program cmd
@@ -117,7 +142,6 @@ end
 testCode = DSL.new
 
 #result_teach = run_test testCode.teach_cmd, testCode.test_arr
-result_stud = run_test testCode.stud_cmd, testCode.test_arr
+result_stud = testCode.run_test testCode.stud_cmd, testCode.test_arr
 puts "#{result_stud}"
-
 
