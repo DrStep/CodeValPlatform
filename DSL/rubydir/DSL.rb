@@ -50,7 +50,7 @@ class DSL
     	@memory_lim = memory_lim
     end
 
-    def cmd_create *files_arr
+    def cmd_create files_arr
         cmd = Hash.new
         case @lang
             when ".c"
@@ -67,7 +67,7 @@ class DSL
 
     def method_missing name, *test_data, &block
     	if name.to_s =~/^test(.+)$/
-            test_arr[test_arr.size] = test_data
+            @test_arr[test_arr.size] = test_data
     	else 
             puts "Method #{name} doesn't exists"
     	end
@@ -76,14 +76,20 @@ class DSL
 end
 
 #functions for runing tests
-def run_test *cmd
-    if (@need_compile)
+def run_test cmd, tests
+    tests_result = []
+    i = 0
+    if (cmd[:compile])
         compile_result = compile_program cmd[:compile]
         if (compile_result)
            return compile_result 
         end
     end
-    return run_program cmd[:run]
+    tests.each do |test|
+        tests_result[i] = run_program cmd[:run], test
+        i += 1
+    end
+    return tests_result
 end
 
 def compile_program cmd
@@ -95,8 +101,8 @@ def compile_program cmd
     end
 end
 
-def run_program cmd
-    Open3.popen3(@run_cmd) do |stdin, stdout, stderr, wait_thr|
+def run_program cmd, *test
+    Open3.popen3("#{cmd} #{test.join(" ")}") do |stdin, stdout, stderr, wait_thr|
         error = stderr.read
         output = stdout.read
         if (!error.empty?)
@@ -110,8 +116,8 @@ end
 #script code
 testCode = DSL.new
 
-result_teach = result testCode.teach_cmd
-result_stud = result testCode.stud_cmd
-
+#result_teach = run_test testCode.teach_cmd, testCode.test_arr
+result_stud = run_test testCode.stud_cmd, testCode.test_arr
+puts "#{result_stud}"
 
 

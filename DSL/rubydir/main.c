@@ -1,16 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main() {!!
-	printf("%s\n", "Test");
+int main(int argc, char *argv[]) {
+	int i=0, temp;
+	for (i=1; i < argc; i++) {
+		printf("%s ", argv[i]);
+	}
 }
-
-/*
-
-prog_language ''
-dir ''
-files ''
-test1 [[2,10,20,30],[3,4]]
-time_limit 14.2
-memory_limit
-*/
