@@ -36,7 +36,6 @@ class DSL
   def students_files(*files_arr)
     @stud_files = files_arr.map { |file| file + @lang }
     @stud_cmd = cmd_create @stud_files
-    puts @stud_cmd
   end
 
   def teachers_files(*files_arr)
@@ -64,12 +63,20 @@ class DSL
 
   def out(*args)
     # @context : stdin, stdout, stderr, wait_thr
+    full_result = {}
+    output = @context[1].gets.strip       # with trailing and leading whitespaces removed
+    full_result[:result] = output
     if args.any?
-      result = @context[1].gets
       expected = args.join ' '
-      p result, expected
+      if output.eql?(expected)
+        full_result[:message] = 'Test passed!'
+        full_result[:pass] = true
+      else
+        full_result[:message] = "Wrong answer! Excpected #{expected}, when the result is #{output}"
+        full_result[:pass] = false
+      end
     end
-    return result
+    return full_result
   end
 
   def cmd_create(files_arr)
@@ -87,51 +94,46 @@ class DSL
     return cmd
   end
 
-# functions for runing tests
-  def run_test
-    stud_cmd = @stud_cmd
+# function for tests runing
+  def run_test(cmd)
     tests_result = {}
-    if stud_cmd[:compile]
-      compile_result = compile_program stud_cmd[:compile]
+    if cmd[:compile]
+      compile_result = compile_program cmd[:compile]
       if compile_result
         return compile_result
       end
     end
     @test.each do |name, block|
-      @context = *Open3.popen3("#{stud_cmd[:run]}")
+      @context = *Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
       errors = @context[2].gets
       tests_result[name] = errors ? errors : result
-      puts("#{name}: #{tests_result[name]}  #{@context[2].gets}")
       @context[1..2].map(&:close)
     end
     return tests_result
   end
-end
 
-def compile_program(cmd)
-  Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
-    error = stderr.read
-    if !error.empty?
-      return error
+  def compile_program(cmd)
+    Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
+      error = stderr.read
+      unless error.empty?
+        return error
+      end
     end
   end
 end
 
-def run_program(cmd, *test)
-  Open3.popen3("#{cmd} #{test.join(' ')}") do |stdin, stdout, stderr, wait_thr|
-    error = stderr.read
-    output = stdout.read
-    if !error.empty?
-      return error
-    else 
-      return output
-    end
+# function that is called from Java-part
+def run_all
+  test_code = DSL.new
+  stud_results = test_code.run_test test_code.stud_cmd
+  teach_results = test_code.run_test test_code.teach_cmd
+  puts("Students one: #{stud_results}")
+  puts("Teachers one: #{teach_results}")
+  if stud_results[:result].eql?(teach_results[:result])
+    puts('100% passed!')
   end
 end
 
 # script code
-test_code = DSL.new
-
-result_stud = test_code.run_test
-puts "#{result_stud}"
+run_all
