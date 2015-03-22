@@ -59,6 +59,7 @@ class DSL
   def in(*args)
     # @context : stdin, stdout, stderr, wait_thr
     @context[0].puts(args.join ' ') if args.any?
+    @context[0].close
   end
 
   def out(*args)
@@ -66,9 +67,9 @@ class DSL
     if args.any?
       result = @context[1].gets
       expected = args.join ' '
-
       p result, expected
     end
+    return result
   end
 
   def cmd_create(files_arr)
@@ -86,28 +87,23 @@ class DSL
     return cmd
   end
 
-  def method_missing(name, *test_data)
-    if name.to_s =~ /^test(.+)$/
-      @test_arr[test_arr.size] = test_data
-    else
-      puts "Method #{name} doesn't exists"
-    end
-  end
-
 # functions for runing tests
-  def run_test(cmd, tests)
-    tests_result = []
-    if cmd[:compile]
-      compile_result = compile_program cmd[:compile]
+  def run_test
+    stud_cmd = @stud_cmd
+    tests_result = {}
+    if stud_cmd[:compile]
+      compile_result = compile_program stud_cmd[:compile]
       if compile_result
         return compile_result
       end
     end
     @test.each do |name, block|
-      puts 'test: ' + name
-      @context = *Open3.popen3("#{cmd[:run]} #{tests.join(' ')}")
-      block.call(self)
-      @context[0..2].map(&:close)
+      @context = *Open3.popen3("#{stud_cmd[:run]}")
+      result = block.call(self)
+      errors = @context[2].gets
+      tests_result[name] = errors ? errors : result
+      puts("#{name}: #{tests_result[name]}  #{@context[2].gets}")
+      @context[1..2].map(&:close)
     end
     return tests_result
   end
@@ -137,5 +133,5 @@ end
 # script code
 test_code = DSL.new
 
-result_stud = test_code.run_test test_code.stud_cmd, test_code.test_arr
+result_stud = test_code.run_test
 puts "#{result_stud}"
