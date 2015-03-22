@@ -23,6 +23,8 @@ public class RequestController {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(upload));
                 stream.write(bytes);
                 stream.close();
+                DSL testOne = new DSL();
+                String
                 result = "You successfully uploaded!";
                 System.out.println(new String(bytes));
             } catch (Exception e) {
