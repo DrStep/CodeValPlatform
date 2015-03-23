@@ -12,6 +12,7 @@ import org.jruby.runtime.Block;
 import org.jruby.runtime.GlobalVariable;
 import org.jruby.runtime.builtin.IRubyObject;
 
+
 import java.io.*;
 import java.util.HashMap;
 
@@ -32,7 +33,7 @@ public class RequestController {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(upload));
                 stream.write(bytes);
                 stream.close();
-                DSL testOne = new DSL();
+                DSL testOne = new DSL("/Users/stepa/IdeaProjects/check/config");
                 HashMap<String, String> testResult = (HashMap<String,String>)testOne.run_all();
                 System.out.println(testResult);
                 result = "You successfully uploaded!";
