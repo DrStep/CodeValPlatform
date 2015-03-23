@@ -7,11 +7,11 @@ time_limit 14.2
 memory_limit 25
 
 test 'first' do |t|
-  t.in 2,10,20,30
-  t.out 2,10,20,30
+  t.in 3,10,20,30
+  t.out 10,20,30
 end
 
 test 'second' do |t|
-  t.in 93,0,-34,1
-  t.out 93,0,-34,1
+  t.in 2,-34,1
+  t.out -34,1
 end
