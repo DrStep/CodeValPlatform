@@ -24,7 +24,7 @@ class DSL
     @test = {}
     read_config  path
   end
-    
+
   def read_config(path)
     eval File.read(path)
   end
@@ -55,13 +55,13 @@ class DSL
     @test[name] = block
   end
 
-  def in(*args)
+  def given(*args)
     # @context : stdin, stdout, stderr, wait_thr
     @context[0].puts(args.join ' ') if args.any?
     @context[0].close
   end
 
-  def out(*args)
+  def expected(*args)
     # @context : stdin, stdout, stderr, wait_thr
     full_result = {}
     output = @context[1].gets.strip       # with trailing and leading whitespaces removed

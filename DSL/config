@@ -6,12 +6,20 @@ students_files 'main'
 time_limit 14.2
 memory_limit 25
 
-test 'first' do |t|
-  t.in 3,10,20,30
-  t.out 10,20,30
+test 'first' do
+  given 3,10,20,30
+  expected 10,20,30
 end
 
-test 'second' do |t|
-  t.in 2,-34,1
-  t.out -34,1
+test 'second' do
+  given 2,-34,1
+  expected -34,1
+end
+
+test 'third' do
+  n = rand 1..10
+  arr = Array.new(n) { rand -50..50 }
+
+  given n, *arr
+  expected *arr
 end
