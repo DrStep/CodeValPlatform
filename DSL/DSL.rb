@@ -1,7 +1,6 @@
 require 'open3'
 require 'java'
-require_relative 'TestGen'
-#require "#{Dir.pwd}/RubyTest.jar"
+require "#{Dir.pwd}/*.jar"
 #java_import Java::RubyTest
 
 # Class that implements dsl
