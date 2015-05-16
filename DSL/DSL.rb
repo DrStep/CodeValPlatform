@@ -1,5 +1,6 @@
 require 'open3'
 require 'java'
+require_relative 'TestGen'
 #require "#{Dir.pwd}/RubyTest.jar"
 #java_import Java::RubyTest
 
@@ -16,6 +17,10 @@ class DSL
   attr_reader :stud_cmd
   attr_reader :context
   attr_reader :test
+  
+  attr_reader :generated_tests_type
+  attr_reader :number_of_tests
+  attr_reader :names_of_tests_data
 
   def initialize(path)
     @test_arr = []
@@ -49,6 +54,21 @@ class DSL
 
   def memory_limit(memory_lim)
     @memory_lim = memory_lim
+  end
+
+  def generate_tests(type)
+  	@generated_tests_type = "#{type}" 
+  	case @generated_tests_type
+  	when 'arr'
+  	  generation_obj = ArrayGen.new
+  	  result_map = generation_obj.gen_tests
+  	  result_map.each do |test_name, array|
+        test test_name do |t|
+         	t.in array
+         	t.out
+        end
+  	  end
+  	end
   end
 
   def test(name, &block)
@@ -104,11 +124,14 @@ class DSL
       end
     end
     @test.each do |name, block|
-      @context = *Open3.popen3("#{cmd[:run]}")
+      @context = Open3.popen3("#{cmd[:run]}")
+      puts name
       result = block.call(self)
       errors = @context[2].gets
       tests_result[name] = errors ? errors : result
       @context[1..2].map(&:close)
+      exit_status = @context[3].value
+      sleep 0.5      
     end
     return tests_result
   end
@@ -137,5 +160,9 @@ end
 
 
 # script code
-#test = DSL.new('/Users/stepa/IdeaProjects/Ccheck/config')
+#№test = DSL.new('/Users/stepa/IdeaProjects/CodeValPlatform/DSL/config')
+#i=0
+#while i!=100
 #test.run_all
+#	i = i + 1
+#end
