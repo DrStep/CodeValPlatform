@@ -1,3 +1,4 @@
+import org.jruby.RubyProcess;
 import org.mortbay.util.ajax.JSON;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,7 +25,7 @@ import java.util.HashMap;
 public class RequestController {
 
     @RequestMapping("/test")
-    public TestClass  testHandler(@RequestParam("file")MultipartFile file) {
+    public TestClass  testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String student,@RequestParam("file")MultipartFile file) {
         String result;
         if (!file.isEmpty()) {
             try {
