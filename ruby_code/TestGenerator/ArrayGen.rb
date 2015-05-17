@@ -6,7 +6,7 @@ class ArrayGen
   attr_reader :length
   attr_reader :range
 
-  def initialize(length = 20, range = 100)
+  def initialize(length, range)
     @range = range.to_i
     @length = length.to_i
   end

@@ -1,13 +1,15 @@
 require 'open3'
 require 'java'
 require "#{Dir.pwd}/lib/ArrayGen.jar"
-#java_import Java::RubyTest
+import Java::ArrayGen
 
 # Class that implements dsl
 class DSL
   attr_reader :lang
   attr_reader :teach_files
   attr_reader :stud_files
+  attr_reader :stud_path
+  attr_reader :teach_path
   attr_reader :test_arr
   attr_reader :time_lim
   attr_reader :memory_lim
@@ -21,16 +23,18 @@ class DSL
   attr_reader :number_of_tests
   attr_reader :names_of_tests_data
 
-  def initialize(path)
+  def initialize(teachers_path, students_path)
     @test_arr = []
     @teach_cmd = {}
     @stud_cmd = {}
     @test = {}
-    read_config  path
+    @teach_path = teachers_path
+    @stud_path = students_path
+    read_config
   end
     
-  def read_config(path)
-    eval File.read(path)
+  def read_config
+    eval File.read(@teach_path + "config")
   end
 
   def language(lang)
@@ -39,12 +43,12 @@ class DSL
 
   def students_files(*files_arr)
     @stud_files = files_arr.map { |file| file + @lang }
-    @stud_cmd = cmd_create @stud_files
+    @stud_cmd = cmd_create @stud_files, false
   end
 
   def teachers_files(*files_arr)
     @teach_files = files_arr.map { |file| file + @lang }
-    @teach_cmd = cmd_create @teach_files
+    @teach_cmd = cmd_create @teach_files, true
   end
 
   def time_limit(time_lim)
@@ -55,11 +59,33 @@ class DSL
     @memory_lim = memory_lim
   end
 
-  def generate_tests(type)
+  def cmd_create(files_arr, teachers)
+    cmd = {}
+    if teachers
+      files_arr.map! { |file_name| @teach_path + file_name }
+      path = @teach_path
+    else
+      files_arr.map! { |file_name| @stud_path + file_name }
+      path = @stud_path
+    end
+    case @lang
+    when '.c'
+      cmd[:compile] = "gcc #{files_arr.join(' ')}"
+      cmd[:run] = "./a.out"
+    when '.p'
+      cmd[:compile] = "pc #{files_arr.join(' ')}"
+      cmd[:run] = "./#{files_arr[0]}"
+    when '.rb'
+      cmd[:run] = "ruby #{files_arr[0]}"
+    end
+    return cmd
+  end
+
+  def generate_tests(type, length = 20, range = 100)
   	@generated_tests_type = "#{type}" 
   	case @generated_tests_type
   	when 'arr'
-  	  generation_obj = ArrayGen.new
+  	  generation_obj = ArrayGen.new length,range
   	  result_map = generation_obj.gen_tests
   	  result_map.each do |test_name, array|
         test test_name do |t|
@@ -98,26 +124,12 @@ class DSL
     return full_result
   end
 
-  def cmd_create(files_arr)
-    cmd = {}
-    case @lang
-    when '.c'
-      cmd[:compile] = "gcc #{files_arr.join(' ')}"
-      cmd[:run] = './a.out'
-    when '.p'
-      cmd[:compile] = "pc #{files_arr.join(' ')}"
-      cmd[:run] = './#{files_arr[0]}'
-    when '.rb'
-      cmd[:run] = "ruby #{files_arr[0]}"
-    end
-    return cmd
-  end
-
 # function for tests runing
   def run_test(cmd)
     tests_result = {}
     if cmd[:compile]
       compile_result = compile_program cmd[:compile]
+      puts compile_result
       if compile_result
         return compile_result
       end
@@ -136,6 +148,7 @@ class DSL
   end
 
   def compile_program(cmd)
+    puts cmd
     Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
       error = stderr.read
       unless error.empty?
@@ -157,11 +170,6 @@ class DSL
   end
 end
 
-
 # script code
-#№test = DSL.new('/Users/stepa/IdeaProjects/CodeValPlatform/DSL/config')
-#i=0
-#while i!=100
-#test.run_all
-#	i = i + 1
-#end
+test = DSL.new('/Users/stepa/IdeaProjects/CodeValPlatform/resources/tasks/arr/', '/Users/stepa/IdeaProjects/CodeValPlatform/ruby_code/DSL/')
+test.run_all
