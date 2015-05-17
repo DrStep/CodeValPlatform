@@ -1,4 +1,5 @@
 import org.jruby.RubyProcess;
+import org.jruby.embed.ScriptingContainer;
 import org.mortbay.util.ajax.JSON;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,10 +13,13 @@ import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.Block;
 import org.jruby.runtime.GlobalVariable;
 import org.jruby.runtime.builtin.IRubyObject;
+import org.yecht.Data;
 
 
+import javax.swing.*;
 import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by stepa on 12.01.15.
@@ -32,15 +36,23 @@ public class RequestController {
         if (!file.isEmpty()) {
             try {
                 byte[] bytes = file.getBytes();
-                File upload = new File(stud_path + filename);
+                File dir = new File(stud_path);
+                if (!dir.exists())
+                    dir.mkdirs();
+                File upload = new File(dir, filename);
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(upload));
                 stream.write(bytes);
                 stream.close();
                 DSL testOne = new DSL(teach_path, stud_path);
-                HashMap<String, String> testResult = (HashMap<String,String>)testOne.run_all();
+                HashMap<String, HashMap> testResult = (HashMap<String,HashMap>)testOne.run_all();
                 System.out.println(testResult);
+                for (Map.Entry<String, HashMap> entry : testResult.entrySet()) {
+                    String key = entry.getKey();
+                    HashMap value = entry.getValue();
+                    System.out.println("Key: " + key + " Values :" + value.toString());
+                }
+
                 result = "You successfully uploaded!";
-                System.out.println(new String(bytes));
             } catch (Exception e) {
                 result = "You failed to upload => " + e.toString();
             }

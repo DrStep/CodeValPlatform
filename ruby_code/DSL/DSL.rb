@@ -2,6 +2,7 @@ require 'open3'
 require 'java'
 require "#{Dir.pwd}/lib/ArrayGen.jar"
 import Java::ArrayGen
+#require "ruby_code/TestGenerator/ArrayGen"
 
 # Class that implements dsl
 class DSL
@@ -22,6 +23,8 @@ class DSL
   attr_reader :generated_tests_type
   attr_reader :number_of_tests
   attr_reader :names_of_tests_data
+  attr_reader :pass_expected
+  attr_reader :pass_teachers
 
   def initialize(teachers_path, students_path)
     @test_arr = []
@@ -30,6 +33,8 @@ class DSL
     @test = {}
     @teach_path = teachers_path
     @stud_path = students_path
+    @pass_expected = true
+    @pass_teachers = true
     read_config
   end
     
@@ -114,14 +119,16 @@ class DSL
     full_result = {}
     output = @context[1].gets.strip       # with trailing and leading whitespaces removed
     full_result[:result] = output
+    full_result[:pass_expected] = true
+    full_result[:error] = false
     if args.any?
       expected = args.join ' '
       if output.eql?(expected)
-        full_result[:message] = 'Test passed!'
-        full_result[:pass] = true
+        full_result[:message] = "Test passed!"
       else
         full_result[:message] = "Wrong answer! Excpected #{expected}, when the result is #{output}"
-        full_result[:pass] = false
+        full_result[:pass_expected] = false
+        @pass_expected = false
       end
     end
     return full_result
@@ -132,18 +139,18 @@ class DSL
     tests_result = {}
     if cmd[:compile]
       compile_result = compile_program cmd[:compile]
-      puts compile_result
       if compile_result
-        return compile_result
+        return { :result => compile_result, :compile_error => true }
       end
     end
     @test.each do |name, block|
+      puts name
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
       errors = @context[2].gets
-      tests_result[name] = errors ? errors : result
+      tests_result[name] = errors ? java.util.HashMap.new({ :result => errors, :error => true, :message => 'Error or warning!' }) : result
       @context[1..2].map(&:close)
-      #exit_status = @context[3].value
+      exit_status = @context[3].value
     end
     return tests_result
   end
@@ -159,17 +166,39 @@ class DSL
 
   # function that is called from Java-part for all tests
   def run_all
+    full_res = {}
     stud_results = run_test stud_cmd
     teach_results = run_test teach_cmd
-    puts("Students one: #{stud_results}")
     puts("Teachers one: #{teach_results}")
-    if stud_results[:result].eql?(teach_results[:result])
-      puts('100% passed!')
+
+    if stud_results[:compile_error]
+      return java.util.HashMap.new({ "compile" => java.util.HashMap.new(stud_results) })
     end
-    return stud_results
+
+    stud_results.each do |test_name, test|
+      if !(test[:error])
+        if test[:result].eql?(teach_results[test_name][:result]) 
+          test[:pass_teachers] = true
+        else 
+          test[:pass_teachers] = false
+          @pass_teachers = false
+        end
+      else
+        @pass_teachers = false
+      end
+      stud_results[test_name] = java.util.HashMap.new(test)
+    end
+    
+    if @pass_teachers && @pass_expected
+      stud_results["full_res"] =  java.util.HashMap.new({ :passed => true })   
+    else 
+      stud_results["full_res"] =  java.util.HashMap.new({ :passed => false })    
+    end
+    puts("Students one: #{stud_results}")
+    return java.util.HashMap.new(stud_results)
   end
 end
 
 # script code
 #test = DSL.new('resources/tasks/arr/', 'ruby_code/DSL/')
-#test.run_all
+#res = test.run_all
