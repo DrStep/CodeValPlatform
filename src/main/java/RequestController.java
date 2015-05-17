@@ -25,14 +25,14 @@ import java.util.HashMap;
 public class RequestController {
 
     @RequestMapping("/test")
-    public TestClass  testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String student,@RequestParam("file")MultipartFile file) {
+    public TestClass  testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String student,@RequestParam("filename")String filename, @RequestParam("file")MultipartFile file) {
         String result;
         String teach_path = DEFAULT_TEACH_PATH + task + '/';
-        String stud_path = DEFAULT_STUD_PATH + task + '/';
+        String stud_path = DEFAULT_STUD_PATH + group + '/' + student + '/' + task + '/';
         if (!file.isEmpty()) {
             try {
                 byte[] bytes = file.getBytes();
-                File upload = new File("Uploaded");
+                File upload = new File(stud_path + filename);
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(upload));
                 stream.write(bytes);
                 stream.close();
@@ -51,6 +51,6 @@ public class RequestController {
         return new TestClass(result);
     }
 
-    String DEFAULT_TEACH_PATH = "/Users/stepa/IdeaProjects/CodeValPlatform/resources/tasks/";
-    String DEFAULT_STUD_PATH = "/Users/stepa/IdeaProjects/CodeValPlatform/resources/tasks/";
+    String DEFAULT_TEACH_PATH = "resources/tasks/";
+    String DEFAULT_STUD_PATH = "resources/students/";
 }

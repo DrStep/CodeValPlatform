@@ -64,14 +64,17 @@ class DSL
     if teachers
       files_arr.map! { |file_name| @teach_path + file_name }
       path = @teach_path
+      output_name = "teach_out"
     else
       files_arr.map! { |file_name| @stud_path + file_name }
       path = @stud_path
+      output_name = "stud_out"
     end
+    path_to_exec_file = "#{path}#{output_name}"
     case @lang
     when '.c'
-      cmd[:compile] = "gcc #{files_arr.join(' ')}"
-      cmd[:run] = "./a.out"
+      cmd[:compile] = "gcc #{files_arr.join(' ')} -o #{path_to_exec_file}"
+      cmd[:run] = "./#{path_to_exec_file}"
     when '.p'
       cmd[:compile] = "pc #{files_arr.join(' ')}"
       cmd[:run] = "./#{files_arr[0]}"
@@ -136,19 +139,16 @@ class DSL
     end
     @test.each do |name, block|
       @context = Open3.popen3("#{cmd[:run]}")
-      puts name
       result = block.call(self)
       errors = @context[2].gets
       tests_result[name] = errors ? errors : result
       @context[1..2].map(&:close)
-      exit_status = @context[3].value
-      sleep 0.5      
+      #exit_status = @context[3].value
     end
     return tests_result
   end
 
   def compile_program(cmd)
-    puts cmd
     Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
       error = stderr.read
       unless error.empty?
@@ -171,5 +171,5 @@ class DSL
 end
 
 # script code
-test = DSL.new('/Users/stepa/IdeaProjects/CodeValPlatform/resources/tasks/arr/', '/Users/stepa/IdeaProjects/CodeValPlatform/ruby_code/DSL/')
-test.run_all
+#test = DSL.new('resources/tasks/arr/', 'ruby_code/DSL/')
+#test.run_all
