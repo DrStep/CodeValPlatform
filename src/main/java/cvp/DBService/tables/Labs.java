@@ -29,16 +29,16 @@ public class Labs {
     private String time;
 
     @Column(name = "ASSESMENT")
-    private String assesment;
+    private String assessment;
 
     public Labs() { }
 
-    public Labs(String labName, String studName, int attempts, String time, String assesment) {
+    public Labs(String labName, String studName, int attempts, String time, String assessment) {
         this.labName = labName;
         this.studName = studName;
         this.attempts = attempts;
         this.time = time;
-        this.assesment = assesment;
+        this.assessment = assessment;
     }
 
     public Long getId() {
@@ -81,7 +81,11 @@ public class Labs {
         return time;
     }
 
-    public void setAssesment(String assesment) {
-        this.assesment = assesment;
+    public void setAssessment(String assessment) {
+        this.assessment = assessment;
+    }
+
+    public String getAssessment() {
+        return assessment;
     }
 }

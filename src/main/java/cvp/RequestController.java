@@ -4,17 +4,20 @@ import cvp.DBService.LabsService;
 import cvp.DBService.StudentService;
 import cvp.DBService.tables.Labs;
 import cvp.DBService.tables.Students;
+import org.jruby.ir.operands.Hash;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import DSL.DSL;
+import org.yecht.Data;
+
+import javax.validation.constraints.Null;
 
 /**
  * Created by stepa on 12.01.15.
@@ -23,9 +26,11 @@ import DSL.DSL;
 @RestController
 public class RequestController {
 
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+
     @RequestMapping("/testDB")
     public void dbHandler() {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        //ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
         LabsService dao = context.getBean(LabsService.class);
         Labs one = new Labs("Array", "Petrov", 10, "01:12:31", "passed");
         Labs two = new Labs("String", "Petrov", 7, "00:07:31", "failed");
@@ -43,7 +48,30 @@ public class RequestController {
         }
     }
 
-    @RequestMapping("/test")
+    @RequestMapping(value = "/students/{student}", method = RequestMethod.GET)
+    public LabsList getStudentResults(@PathVariable String student) {
+        HashMap<String, ArrayList<HashMap>> resultHash = new HashMap<>();
+        ArrayList<HashMap> allLabsArr = new ArrayList<>();
+        LabsService labsServ = context.getBean(LabsService.class);
+        List<Labs> labs = labsServ.getAllForStudent(student);
+        if (labs.isEmpty()) {
+            resultHash.put("Empty", new ArrayList<HashMap>());
+            return new LabsList(resultHash);
+        }
+
+        for (Labs iter : labs) {
+            HashMap<String, String> oneLabHash =new HashMap<>();
+            oneLabHash.put("labName", iter.getLabName());
+            oneLabHash.put("timeDoing", iter.getTime());
+            oneLabHash.put("attempts", String.valueOf(iter.getAttempts()));
+            oneLabHash.put("assessment", iter.getAssessment());
+            allLabsArr.add(oneLabHash);
+        }
+        resultHash.put("labs", allLabsArr);
+        return new LabsList(resultHash);
+    }
+
+    @RequestMapping("/code")
     public TestClass testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String student,@RequestParam("filename")String filename, @RequestParam("file")MultipartFile file) {
         String result;
         String teach_path = DEFAULT_TEACH_PATH + task + '/';

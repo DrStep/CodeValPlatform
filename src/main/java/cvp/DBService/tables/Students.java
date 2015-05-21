@@ -8,14 +8,14 @@ import java.io.Serializable;
  */
 
 @Entity
-@Table (name = "STUDENTS")
+@Table (name = "STUDENTS" )
 public class Students implements Serializable{
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(name = "STUDENT")
+    @Column(name = "STUDENT", unique=true)
     private String studName;
 
     @Column(name = "GROUP_NUMB")
@@ -24,7 +24,7 @@ public class Students implements Serializable{
     @Column(name = "LABS_COMPLETED")
     private int labsCompleted;
 
-    @Column(name = "FINAL_ASSESMENT")
+    @Column(name = "FINAL_ASSESSMENT")
     private String finalAssessment;
 
     public Students() { }

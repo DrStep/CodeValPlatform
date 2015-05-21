@@ -24,7 +24,7 @@ public class LabsService {
     }
 
     public List<Labs> getAllForStudent(String studName) {
-        System.out.println("In StudentDAOImpl getAllFromGroup");
+        System.out.println("In LabsService getAllFromGroup");
         return labsDAO.getAllForStudent(studName);
     }
 }
