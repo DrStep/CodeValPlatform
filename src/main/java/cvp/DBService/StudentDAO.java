@@ -29,8 +29,12 @@ public class StudentDAO {
         return student.getId();
     }
 
-    public List<Students> getAllFromGroup(String group) {
-        System.out.println("select all from STUDENTS where GROUP_NUMB=" + group);
-        return em.createQuery("select s from Students s where s.group=\'" + group + "\'", Students.class).getResultList();
+    public List<Students> getAllStudents() {
+        return em.createQuery("from Students", Students.class).getResultList();
+    }
+
+    public Students getResultForStudent(String student) {
+        System.out.println("select all from STUDENTS where studName=" + student);
+        return em.createQuery("select s from Students s where s.studName=\'" + student + "\'", Students.class).getSingleResult();
     }
 }

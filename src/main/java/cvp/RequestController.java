@@ -4,6 +4,9 @@ import cvp.DBService.LabsService;
 import cvp.DBService.StudentService;
 import cvp.DBService.tables.Labs;
 import cvp.DBService.tables.Students;
+import cvp.ResponseJSON.GroupStudents;
+import cvp.ResponseJSON.LabsList;
+import cvp.ResponseJSON.StudentResults;
 import org.jruby.ir.operands.Hash;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import DSL.DSL;
 import org.yecht.Data;
-
-import javax.validation.constraints.Null;
 
 /**
  * Created by stepa on 12.01.15.
@@ -48,14 +49,14 @@ public class RequestController {
         }
     }
 
-    @RequestMapping(value = "/students/{student}", method = RequestMethod.GET)
-    public LabsList getStudentResults(@PathVariable String student) {
+    @RequestMapping(value = "/labs/{student}", method = RequestMethod.GET)
+    public LabsList getLabsResults(@PathVariable String student) {
         HashMap<String, ArrayList<HashMap>> resultHash = new HashMap<>();
         ArrayList<HashMap> allLabsArr = new ArrayList<>();
         LabsService labsServ = context.getBean(LabsService.class);
         List<Labs> labs = labsServ.getAllForStudent(student);
         if (labs.isEmpty()) {
-            resultHash.put("Empty", new ArrayList<HashMap>());
+            resultHash.put("empty", new ArrayList<HashMap>());
             return new LabsList(resultHash);
         }
 
@@ -69,6 +70,53 @@ public class RequestController {
         }
         resultHash.put("labs", allLabsArr);
         return new LabsList(resultHash);
+    }
+
+    @RequestMapping(value = "/students/{student}", method = RequestMethod.GET)
+    public StudentResults getStudentResults(@PathVariable String studName) {
+        HashMap<String, String> resultHash = new HashMap<>();
+        StudentService studServ = context.getBean(StudentService.class);
+        Students student = studServ.getResultForStudent(studName);
+        if (student == null) {
+            resultHash.put("empty", "");
+            return new StudentResults(resultHash);
+        }
+
+        resultHash.put("studName", student.getStudName());
+        resultHash.put("group", student.getGroup());
+        resultHash.put("labsCompleted", String.valueOf(student.getLabsCompleted()));
+        resultHash.put("finalAssessment", student.getFinalAssessment());
+        return new StudentResults(resultHash);
+    }
+
+    @RequestMapping(value = "/groups/{group}", method = RequestMethod.GET)
+    public GroupStudents getGroupResults(@PathVariable String group) {
+        ArrayList<HashMap<String, Object>> resultArr = new ArrayList<>();
+        ArrayList<HashMap<String, String>> labsArr = new ArrayList<>();
+        StudentService studServ = context.getBean(StudentService.class);
+        LabsService labsServ = context.getBean(LabsService.class);
+
+        List<Students> allStudents = studServ.getAllStudents();
+        for (Students stud : allStudents) {
+            HashMap<String, Object> studentResults = new HashMap<>();
+            String studentName = stud.getStudName();
+            List<Labs> labs = labsServ.getAllForStudent(studentName);
+
+            studentResults.put("studName", studentName);
+            studentResults.put("finalAssessment", stud.getFinalAssessment());
+            for (Labs oneLab : labs) {
+                HashMap<String, String> labHash = new HashMap<>();
+                labHash.put("labName", oneLab.getLabName());
+                labHash.put("assessment", oneLab.getAssessment());
+                labHash.put("attempts", String.valueOf(oneLab.getAttempts()));
+                labHash.put("time", oneLab.getTime());
+                labsArr.add(labHash);
+            }
+            studentResults.put("labs", labsArr);
+            resultArr.add(studentResults);
+        }
+
+        return new GroupStudents(resultArr);
     }
 
     @RequestMapping("/code")
