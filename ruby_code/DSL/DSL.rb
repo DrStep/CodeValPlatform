@@ -2,6 +2,7 @@ require 'open3'
 require 'java'
 require "#{Dir.pwd}/lib/ArrayGen.jar"
 import Java::ArrayGen
+java_package 'cvp'
 #require "ruby_code/TestGenerator/ArrayGen"
 
 # Class that implements dsl
@@ -124,9 +125,9 @@ class DSL
     if args.any?
       expected = args.join ' '
       if output.eql?(expected)
-        full_result[:message] = "Test passed!"
+        full_result[:message] = "Test passed! \n"
       else
-        full_result[:message] = "Wrong answer! Excpected #{expected}, when the result is #{output}"
+        full_result[:message] = "Wrong answer! Excpected #{expected}, when the result is #{output} \n"
         full_result[:pass_expected] = false
         @pass_expected = false
       end
@@ -145,8 +146,13 @@ class DSL
     end
     @test.each do |name, block|
       puts name
+      start_time = (Time.now.to_f * 1000.0).to_i
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
+      result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time
+      if (result[:taken_time] > @time_limit)
+        result[:message] += "Your programm is running too long. #{@time_limit} ms expected and yours - #{result[:taken_time]}"
+
       errors = @context[2].gets
       tests_result[name] = errors ? java.util.HashMap.new({ :result => errors, :error => true, :message => 'Error or warning!' }) : result
       @context[1..2].map(&:close)

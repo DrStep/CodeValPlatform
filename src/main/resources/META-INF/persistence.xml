@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             version="1.0">
+    <persistence-unit name="codeval" transaction-type="RESOURCE_LOCAL" >
+        <class>cvp.DBService.tables.Students</class>
+        <class>cvp.DBService.tables.Labs</class>
+    </persistence-unit>
+</persistence>
