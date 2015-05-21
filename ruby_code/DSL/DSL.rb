@@ -117,22 +117,19 @@ class DSL
 
   def out(*args)
     # @context : stdin, stdout, stderr, wait_thr
-    full_result = {}
+    result = {}
     output = @context[1].gets.strip       # with trailing and leading whitespaces removed
-    full_result[:result] = output
-    full_result[:pass_expected] = true
-    full_result[:error] = false
+    result[:result] = output
+    result[:error] = false
     if args.any?
       expected = args.join ' '
-      if output.eql?(expected)
-        full_result[:message] = "Test passed! \n"
-      else
-        full_result[:message] = "Wrong answer! Excpected #{expected}, when the result is #{output} \n"
-        full_result[:pass_expected] = false
+      if !output.eql?(expected)
+        result[:message] = "Wrong answer! Excpected #{expected}, when the result is #{output} \n"
+        result[:error] = false
         @pass_expected = false
       end
     end
-    return full_result
+    return result
   end
 
 # function for tests runing
@@ -150,11 +147,13 @@ class DSL
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
       result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time
-      if (result[:taken_time] > @time_limit)
-        result[:message] += "Your programm is running too long. #{@time_limit} ms expected and yours - #{result[:taken_time]}"
+      if (result[:taken_time] > @time_lim)
+        result[:message] += "Your programm is running too long. #{@time_limit} ms expected and yours - #{result[:taken_time]} \n"
+        result[:error] = true
+      end
 
       errors = @context[2].gets
-      tests_result[name] = errors ? java.util.HashMap.new({ :result => errors, :error => true, :message => 'Error or warning!' }) : result
+      tests_result[name] = errors ? java.util.HashMap.new({ :result => errors, :error => true, :message => 'Error or warning!\n' }) : result
       @context[1..2].map(&:close)
       exit_status = @context[3].value
     end
@@ -183,10 +182,9 @@ class DSL
 
     stud_results.each do |test_name, test|
       if !(test[:error])
-        if test[:result].eql?(teach_results[test_name][:result]) 
-          test[:pass_teachers] = true
-        else 
-          test[:pass_teachers] = false
+        if !test[:result].eql?(teach_results[test_name][:result]) 
+          test[:error] = true
+          test[:message] = "Aoutomatic generated test failed. Excpected #{teach_results[test_name][:result]}, when result is #{test[:result]}"
           @pass_teachers = false
         end
       else
