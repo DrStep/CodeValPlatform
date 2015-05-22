@@ -23,6 +23,12 @@ public class LabsService {
         return id;
     }
 
+    public void updateLabs(String studName, String labName, String testRes) {
+        labsDAO.updateLabAttempts(studName, labName);
+        if (testRes.equals("passed"))
+            labsDAO.updateLabTest(studName, labName);
+    }
+
     public List<Labs> getLabForStudent(String studName, String labName) {
         return labsDAO.getLabForStudent(studName, labName);
     }

@@ -3,6 +3,7 @@ package cvp.DBService;
 import cvp.DBService.tables.Students;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.yecht.Data;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,9 +25,18 @@ public class StudentDAO {
     }
 
     public Long save(Students student) {
-        System.out.println("In StudentDAOImpl save");
         em.persist(student);
         return student.getId();
+    }
+
+    public void updateLabsCompleted(String studName) {
+        em.createQuery("update Students s set s.labsCompleted=s.labsCompleted+1 "
+                + "s.studName=\'" + studName + "\'", Students.class).executeUpdate();
+    }
+
+    public void updateFinalAssessment(String studName) {
+        em.createQuery("update Students s set s.finalAssessment=\'passes\' "
+                + "s.studName=\'" + studName + "\'", Students.class).executeUpdate();
     }
 
     public List<Students> getAllStudents() {
@@ -38,7 +48,6 @@ public class StudentDAO {
     }
 
     public List<Students> getResultForStudent(String student) {
-        System.out.println("select all from STUDENTS where studName=" + student);
         return em.createQuery("select s from Students s where s.studName=\'" + student + "\'", Students.class).getResultList();
     }
 }

@@ -21,6 +21,11 @@ public class StudentService {
         return id;
     }
 
+    public void updateStudent(String studName, int incLabsCompleted, int labsNeeded) {
+        studentDAO.updateLabsCompleted(studName);
+        if (++incLabsCompleted == labsNeeded)
+            studentDAO.updateFinalAssessment(studName);
+    }
     public List<Students> getAllStudents() {
         return studentDAO.getAllStudents();
     }

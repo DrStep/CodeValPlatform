@@ -30,6 +30,16 @@ public class LabsDAO {
         return lab.getId();
     }
 
+    public void updateLabAttempts(String studName, String labName) {
+        em.createQuery("update Labs l set l.attempts=l.attemprs+1 "
+                + "where l.labName=\'" + labName + " and l.studName=\'" + studName + "\'", Labs.class).executeUpdate();
+    }
+
+    public void updateLabTest(String studName, String labName) {
+        em.createQuery("update Labs l set l.test=\'passed\' "
+                + "where l.labName=\'" + labName + " and l.studName=\'" + studName + "\'", Labs.class).executeUpdate();
+    }
+
     public List<Labs> getLabForStudent(String studName, String labName) {
         return em.createQuery("select s from Labs s where s.studName=\'" + studName + "\' AND s.labName=\'" + labName + "\'", Labs.class).getResultList();
     }

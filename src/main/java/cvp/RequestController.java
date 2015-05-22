@@ -125,7 +125,9 @@ public class RequestController {
     }
 
     @RequestMapping("/code")
-    public CodeRunResults testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String studName,@RequestParam("filename")String filename, @RequestParam("file")MultipartFile file) {
+    public CodeRunResults testHandler(@RequestParam("task") String task, @RequestParam("group") String group,
+                                      @RequestParam("student") String studName,@RequestParam("filename")String filename,
+                                      @RequestParam("labsCount") int labsCount,@RequestParam("file")MultipartFile file) {
         HashMap<String, Object> result = new HashMap<>();
         String teach_path = DEFAULT_TEACH_PATH + task + '/';
         String stud_path = DEFAULT_STUD_PATH + group + '/' + studName + '/' + task + '/';
@@ -168,8 +170,13 @@ public class RequestController {
                 if (labToUpdate.isEmpty()) {
                     Labs labNew = new Labs(task, studName, 1, String.valueOf(0), labResult);
                     labsServ.save(labNew);
+                    if (labResult.equals("passed")) {
+                        studServ.updateStudent(studName, student.getLabsCompleted(), labsCount);
+                    }
                 } else {
                     Labs labUpd = labToUpdate.get(0);
+                    if (!labUpd.getTest().equals("passed"))
+                        labsServ.updateLabs(studName, task, labResult);
                 }
 
                 result = testResult;
