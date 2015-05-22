@@ -98,9 +98,9 @@ class DSL
   	  generation_obj = ArrayGen.new length,range
   	  @generated_tests = generation_obj.gen_tests
   	  @generated_tests.each do |test_name, array|
-        test test_name do |t|
-         	t.in array
-         	t.out
+        test test_name do
+         	given array
+         	expected
         end
   	  end
   	end
@@ -110,13 +110,13 @@ class DSL
     @test[name] = block
   end
 
-  def in(*args)
+  def given(*args)
     # @context : stdin, stdout, stderr, wait_thr
     @context[0].puts(args.join ' ') if args.any?
     @context[0].close
   end
 
-  def out(*args)
+  def expected(*args)
     # @context : stdin, stdout, stderr, wait_thr
     result = {}
     output = @context[1].gets.strip       # with trailing and leading whitespaces removed
