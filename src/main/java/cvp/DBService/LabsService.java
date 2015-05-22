@@ -23,6 +23,10 @@ public class LabsService {
         return id;
     }
 
+    public List<Labs> getLabForStudent(String studName, String labName) {
+        return labsDAO.getLabForStudent(studName, labName);
+    }
+
     public List<Labs> getAllForStudent(String studName) {
         System.out.println("In LabsService getAllFromGroup");
         return labsDAO.getAllForStudent(studName);

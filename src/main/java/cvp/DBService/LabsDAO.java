@@ -30,6 +30,10 @@ public class LabsDAO {
         return lab.getId();
     }
 
+    public List<Labs> getLabForStudent(String studName, String labName) {
+        return em.createQuery("select s from Labs s where s.studName=\'" + studName + "\' AND s.labName=\'" + labName + "\'", Labs.class).getResultList();
+    }
+
     public List<Labs> getAllForStudent(String studName) {
         System.out.println("select all from Labs where studNmae=" + studName);
         return em.createQuery("select s from Labs s where s.studName=\'" + studName + "\'", Labs.class).getResultList();

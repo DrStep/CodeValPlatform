@@ -8,17 +8,20 @@ import cvp.ResponseJSON.CodeRunResults;
 import cvp.ResponseJSON.GroupStudents;
 import cvp.ResponseJSON.LabsList;
 import cvp.ResponseJSON.StudentResults;
+import org.jruby.RubyProcess;
 import org.jruby.ir.operands.Hash;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import cvp.DSL;
+import org.yecht.Data;
 
 /**
  * Created by stepa on 12.01.15.
@@ -66,7 +69,7 @@ public class RequestController {
             oneLabHash.put("labName", iter.getLabName());
             oneLabHash.put("timeDoing", iter.getTime());
             oneLabHash.put("attempts", String.valueOf(iter.getAttempts()));
-            oneLabHash.put("assessment", iter.getAssessment());
+            oneLabHash.put("test", iter.getTest());
             allLabsArr.add(oneLabHash);
         }
         resultHash.put("labs", allLabsArr);
@@ -109,7 +112,7 @@ public class RequestController {
             for (Labs oneLab : labs) {
                 HashMap<String, String> labHash = new HashMap<>();
                 labHash.put("labName", oneLab.getLabName());
-                labHash.put("assessment", oneLab.getAssessment());
+                labHash.put("test", oneLab.getTest());
                 labHash.put("attempts", String.valueOf(oneLab.getAttempts()));
                 labHash.put("time", oneLab.getTime());
                 labsArr.add(labHash);
@@ -122,10 +125,10 @@ public class RequestController {
     }
 
     @RequestMapping("/code")
-    public CodeRunResults testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String student,@RequestParam("filename")String filename, @RequestParam("file")MultipartFile file) {
+    public CodeRunResults testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String studName,@RequestParam("filename")String filename, @RequestParam("file")MultipartFile file) {
         HashMap<String, Object> result = new HashMap<>();
         String teach_path = DEFAULT_TEACH_PATH + task + '/';
-        String stud_path = DEFAULT_STUD_PATH + group + '/' + student + '/' + task + '/';
+        String stud_path = DEFAULT_STUD_PATH + group + '/' + studName + '/' + task + '/';
         if (!file.isEmpty()) {
             try {
                 byte[] bytes = file.getBytes();
@@ -138,6 +141,8 @@ public class RequestController {
                 stream.close();
                 DSL testOne = new DSL(teach_path, stud_path);
                 HashMap<String, Object> testResult = (HashMap<String,Object>)testOne.run_all();
+                HashMap<String, Object> overallHash = (HashMap<String, Object>)testResult.get("overall_result");
+                String labResult = overallHash.get("test").toString();
 
                 //Server logs
                 System.out.println(testResult);
@@ -147,9 +152,30 @@ public class RequestController {
                     System.out.println("Key: " + key + " Values :" + value.toString());
                 }
 
+                //save to DataBase lab results, create student if don't exists in STUDENTS
+                Students student;
+                StudentService studServ = context.getBean(StudentService.class);
+                List<Students> studentRes = studServ.getResultForStudent(studName);
+                if (studentRes.isEmpty()) {
+                    student = new Students(studName, group, 0, "failed");
+                    studServ.save(student);
+                } else {
+                    student = studentRes.get(0);
+                }
+
+                LabsService labsServ = context.getBean(LabsService.class);
+                List<Labs> labToUpdate = labsServ.getLabForStudent(studName, task);
+                if (labToUpdate.isEmpty()) {
+                    Labs labNew = new Labs(task, studName, 1, String.valueOf(0), labResult);
+                    labsServ.save(labNew);
+                } else {
+                    Labs labUpd = labToUpdate.get(0);
+                }
+
                 result = testResult;
                 result.put("error", false);
             } catch (Exception e) {
+                System.out.println("Error: " + e.toString());
                 result.put("error", true);
                 result.put("message", "You failed to upload!");
             }
@@ -157,7 +183,6 @@ public class RequestController {
             result.put("error", true);
             result.put("message", "You failed to upload because the file was empty.");
         }
-        System.out.println(result);
         return new CodeRunResults(result);
     }
 

@@ -198,9 +198,9 @@ class DSL
     end
     
     if @pass_teachers && @pass_expected
-      stud_results["overall_result"] =  java.util.HashMap.new({ :passed => true })   
+      stud_results["overall_result"] =  java.util.HashMap.new({ "test" => "passed" })   
     else 
-      stud_results["overall_result"] =  java.util.HashMap.new({ :passed => false })    
+      stud_results["overall_result"] =  java.util.HashMap.new({ "test" => "failed" })  
     end
     puts("Students one: #{stud_results}")
     return java.util.HashMap.new(stud_results)
@@ -209,4 +209,4 @@ end
 
 # script code
 #test = DSL.new('resources/tasks/arr/', 'ruby_code/DSL/')
-#res = test.run_all
+#es = test.run_all

@@ -17,8 +17,7 @@ public class StudentService {
     private StudentDAO studentDAO;
 
     public Long save(Students student) {
-        Long id;
-        id = studentDAO.save(student);
+        Long id = studentDAO.save(student);
         return id;
     }
 
