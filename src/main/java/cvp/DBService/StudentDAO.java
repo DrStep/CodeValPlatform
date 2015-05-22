@@ -33,8 +33,12 @@ public class StudentDAO {
         return em.createQuery("from Students", Students.class).getResultList();
     }
 
-    public Students getResultForStudent(String student) {
+    public List<Students> getStudentsFromGroup(String group) {
+        return em.createQuery("select s from Students s where s.group=\'" + group + "\'", Students.class).getResultList();
+    }
+
+    public List<Students> getResultForStudent(String student) {
         System.out.println("select all from STUDENTS where studName=" + student);
-        return em.createQuery("select s from Students s where s.studName=\'" + student + "\'", Students.class).getSingleResult();
+        return em.createQuery("select s from Students s where s.studName=\'" + student + "\'", Students.class).getResultList();
     }
 }

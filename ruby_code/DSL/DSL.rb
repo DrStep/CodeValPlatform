@@ -21,6 +21,7 @@ class DSL
   attr_reader :context
   attr_reader :test
   
+  attr_reader :generated_tests
   attr_reader :generated_tests_type
   attr_reader :number_of_tests
   attr_reader :names_of_tests_data
@@ -95,8 +96,8 @@ class DSL
   	case @generated_tests_type
   	when 'arr'
   	  generation_obj = ArrayGen.new length,range
-  	  result_map = generation_obj.gen_tests
-  	  result_map.each do |test_name, array|
+  	  @generated_tests = generation_obj.gen_tests
+  	  @generated_tests.each do |test_name, array|
         test test_name do |t|
          	t.in array
          	t.out
@@ -142,16 +143,20 @@ class DSL
       end
     end
     @test.each do |name, block|
-      puts name
       start_time = (Time.now.to_f * 1000.0).to_i
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
       result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time
       if (result[:taken_time] > @time_lim)
-        result[:message] += "Your programm is running too long. #{@time_limit} ms expected and yours - #{result[:taken_time]} \n"
+        time_msg = "Your programm is running too long. #{@time_limit} ms expected and yours - #{result[:taken_time]} \n"
+        if (result[:message])
+          result[:message] += time_msg
+        else
+          result[:message] = time_msg
+        end
         result[:error] = true
       end
-
+      result[:tests_data] = @generated_tests[name]
       errors = @context[2].gets
       tests_result[name] = errors ? java.util.HashMap.new({ :result => errors, :error => true, :message => 'Error or warning!\n' }) : result
       @context[1..2].map(&:close)
@@ -171,7 +176,6 @@ class DSL
 
   # function that is called from Java-part for all tests
   def run_all
-    full_res = {}
     stud_results = run_test stud_cmd
     teach_results = run_test teach_cmd
     puts("Teachers one: #{teach_results}")
@@ -194,9 +198,9 @@ class DSL
     end
     
     if @pass_teachers && @pass_expected
-      stud_results["full_res"] =  java.util.HashMap.new({ :passed => true })   
+      stud_results["overall_result"] =  java.util.HashMap.new({ :passed => true })   
     else 
-      stud_results["full_res"] =  java.util.HashMap.new({ :passed => false })    
+      stud_results["overall_result"] =  java.util.HashMap.new({ :passed => false })    
     end
     puts("Students one: #{stud_results}")
     return java.util.HashMap.new(stud_results)

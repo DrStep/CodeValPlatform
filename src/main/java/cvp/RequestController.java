@@ -4,6 +4,7 @@ import cvp.DBService.LabsService;
 import cvp.DBService.StudentService;
 import cvp.DBService.tables.Labs;
 import cvp.DBService.tables.Students;
+import cvp.ResponseJSON.CodeRunResults;
 import cvp.ResponseJSON.GroupStudents;
 import cvp.ResponseJSON.LabsList;
 import cvp.ResponseJSON.StudentResults;
@@ -17,8 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import DSL.DSL;
-import org.yecht.Data;
+import cvp.DSL;
 
 /**
  * Created by stepa on 12.01.15.
@@ -37,16 +37,17 @@ public class RequestController {
         Labs two = new Labs("String", "Petrov", 7, "00:07:31", "failed");
         Labs three = new Labs("Array", "Ivanov", 11, "00:22:01", "passed");
 
+        /*StudentService dao = context.getBean(StudentService.class);
+        Students one = new Students("Petrov", "IU6-81",10, "passed");
+        Students two = new Students("Alexeev", "IU6-81", 7, "failed");
+        Students three = new Students("Ivanov", "IU6-83", 8, "passed");*/
+
+
         System.out.println("!!!!!");
         dao.save(one);
         dao.save(two);
         dao.save(three);
 
-        List<Labs> result = dao.getAllForStudent("Petrov");
-
-        for (Labs iter : result) {
-            System.out.println(iter.getLabName());
-        }
     }
 
     @RequestMapping(value = "/labs/{student}", method = RequestMethod.GET)
@@ -72,16 +73,17 @@ public class RequestController {
         return new LabsList(resultHash);
     }
 
-    @RequestMapping(value = "/students/{student}", method = RequestMethod.GET)
+    @RequestMapping(value = "/students/{studName}", method = RequestMethod.GET)
     public StudentResults getStudentResults(@PathVariable String studName) {
         HashMap<String, String> resultHash = new HashMap<>();
         StudentService studServ = context.getBean(StudentService.class);
-        Students student = studServ.getResultForStudent(studName);
-        if (student == null) {
+        List<Students> studentList = studServ.getResultForStudent(studName);
+        if (studentList.isEmpty()) {
             resultHash.put("empty", "");
             return new StudentResults(resultHash);
         }
 
+        Students student = studentList.get(0);
         resultHash.put("studName", student.getStudName());
         resultHash.put("group", student.getGroup());
         resultHash.put("labsCompleted", String.valueOf(student.getLabsCompleted()));
@@ -96,7 +98,7 @@ public class RequestController {
         StudentService studServ = context.getBean(StudentService.class);
         LabsService labsServ = context.getBean(LabsService.class);
 
-        List<Students> allStudents = studServ.getAllStudents();
+        List<Students> allStudents = studServ.getStudentsFromGroup(group);
         for (Students stud : allStudents) {
             HashMap<String, Object> studentResults = new HashMap<>();
             String studentName = stud.getStudName();
@@ -120,8 +122,8 @@ public class RequestController {
     }
 
     @RequestMapping("/code")
-    public TestClass testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String student,@RequestParam("filename")String filename, @RequestParam("file")MultipartFile file) {
-        String result;
+    public CodeRunResults testHandler(@RequestParam("task") String task, @RequestParam("group") String group, @RequestParam("student") String student,@RequestParam("filename")String filename, @RequestParam("file")MultipartFile file) {
+        HashMap<String, Object> result = new HashMap<>();
         String teach_path = DEFAULT_TEACH_PATH + task + '/';
         String stud_path = DEFAULT_STUD_PATH + group + '/' + student + '/' + task + '/';
         if (!file.isEmpty()) {
@@ -135,23 +137,28 @@ public class RequestController {
                 stream.write(bytes);
                 stream.close();
                 DSL testOne = new DSL(teach_path, stud_path);
-                HashMap<String, HashMap> testResult = (HashMap<String,HashMap>)testOne.run_all();
+                HashMap<String, Object> testResult = (HashMap<String,Object>)testOne.run_all();
+
+                //Server logs
                 System.out.println(testResult);
-                for (Map.Entry<String, HashMap> entry : testResult.entrySet()) {
+                for (Map.Entry<String, Object> entry : testResult.entrySet()) {
                     String key = entry.getKey();
-                    HashMap value = entry.getValue();
+                    HashMap value = (HashMap)entry.getValue();
                     System.out.println("Key: " + key + " Values :" + value.toString());
                 }
 
-                result = "You successfully uploaded!";
+                result = testResult;
+                result.put("error", false);
             } catch (Exception e) {
-                result = "You failed to upload => " + e.toString();
+                result.put("error", true);
+                result.put("message", "You failed to upload!");
             }
         } else {
-            result = "You failed to upload because the file was empty.";
+            result.put("error", true);
+            result.put("message", "You failed to upload because the file was empty.");
         }
         System.out.println(result);
-        return new TestClass(result);
+        return new CodeRunResults(result);
     }
 
     String DEFAULT_TEACH_PATH = "resources/tasks/";

@@ -15,7 +15,7 @@ public class Students implements Serializable{
     @GeneratedValue
     private Long id;
 
-    @Column(name = "STUDENT", unique=true)
+    @Column(name = "STUDENT")
     private String studName;
 
     @Column(name = "GROUP_NUMB")

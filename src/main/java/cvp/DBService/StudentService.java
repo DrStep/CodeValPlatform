@@ -26,7 +26,11 @@ public class StudentService {
         return studentDAO.getAllStudents();
     }
 
-    public Students getResultForStudent(String student) {
+    public List<Students> getStudentsFromGroup(String group) {
+        return studentDAO.getStudentsFromGroup(group);
+    }
+
+    public List<Students> getResultForStudent(String student) {
         System.out.println("In StudentDAOImpl getAllFromGroup");
         return studentDAO.getResultForStudent(student);
     }
