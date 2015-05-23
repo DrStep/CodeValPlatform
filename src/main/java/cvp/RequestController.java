@@ -143,6 +143,13 @@ public class RequestController {
                 stream.close();
                 DSL testOne = new DSL(teach_path, stud_path);
                 HashMap<String, Object> testResult = (HashMap<String,Object>)testOne.run_all();
+                System.out.println(testResult);
+                if (testResult.get("compile_error") != null) {
+                    result.put("error", true);
+                    result.put("message", testResult.get("compile_error"));
+                    return new CodeRunResults(result);
+                }
+
                 HashMap<String, Object> overallHash = (HashMap<String, Object>)testResult.get("overall_result");
                 String labResult = overallHash.get("test").toString();
 

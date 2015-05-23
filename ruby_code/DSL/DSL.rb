@@ -139,7 +139,7 @@ class DSL
     if cmd[:compile]
       compile_result = compile_program cmd[:compile]
       if compile_result
-        return { :result => compile_result, :compile_error => true }
+        return { "compile_error" => compile_result, :error => true }
       end
     end
     @test.each do |name, block|
@@ -180,8 +180,8 @@ class DSL
     teach_results = run_test teach_cmd
     puts("Teachers one: #{teach_results}")
 
-    if stud_results[:compile_error]
-      return java.util.HashMap.new({ "compile" => java.util.HashMap.new(stud_results) })
+    if stud_results["compile_error"]
+      return java.util.HashMap.new(stud_results)
     end
 
     stud_results.each do |test_name, test|
@@ -209,4 +209,4 @@ end
 
 # script code
 #test = DSL.new('resources/tasks/arr/', 'ruby_code/DSL/')
-#es = test.run_all
+#res = test.run_all
