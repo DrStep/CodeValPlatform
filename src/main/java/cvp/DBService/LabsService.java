@@ -24,6 +24,7 @@ public class LabsService {
     }
 
     public void updateLabs(String studName, String labName, String testRes) {
+        System.out.println("updateLabs");
         labsDAO.updateLabAttempts(studName, labName);
         if (testRes.equals("passed"))
             labsDAO.updateLabTest(studName, labName);

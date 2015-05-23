@@ -30,13 +30,13 @@ public class StudentDAO {
     }
 
     public void updateLabsCompleted(String studName) {
-        em.createQuery("update Students s set s.labsCompleted=s.labsCompleted+1 "
-                + "s.studName=\'" + studName + "\'", Students.class).executeUpdate();
+        em.createQuery("update Students s set s.labsCompleted = s.labsCompleted+1  "
+                + "where s.studName = \'" + studName + "\'").executeUpdate();
     }
 
     public void updateFinalAssessment(String studName) {
-        em.createQuery("update Students s set s.finalAssessment=\'passes\' "
-                + "s.studName=\'" + studName + "\'", Students.class).executeUpdate();
+        em.createQuery("update Students s set s.finalAssessment=\'passed\'  "
+                + "where s.studName=\'" + studName + "\'").executeUpdate();
     }
 
     public List<Students> getAllStudents() {

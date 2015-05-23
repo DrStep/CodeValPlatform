@@ -143,8 +143,20 @@ public class RequestController {
                 stream.close();
                 DSL testOne = new DSL(teach_path, stud_path);
                 HashMap<String, Object> testResult = (HashMap<String,Object>)testOne.run_all();
-                System.out.println(testResult);
+
+                //Server logs for ruby code
+                /*System.out.println(testResult);
+                for (Map.Entry<String, Object> entry : testResult.entrySet()) {
+                    String key = entry.getKey();
+                    HashMap value = (HashMap)entry.getValue();
+                    System.out.println("Key: " + key + " Values :" + value.toString());
+                }*/
+
+                LabsService labsServ = context.getBean(LabsService.class);
+                StudentService studServ = context.getBean(StudentService.class);
+
                 if (testResult.get("compile_error") != null) {
+                    labsServ.updateLabs(studName, task, "failed");
                     result.put("error", true);
                     result.put("message", testResult.get("compile_error"));
                     return new CodeRunResults(result);
@@ -153,17 +165,8 @@ public class RequestController {
                 HashMap<String, Object> overallHash = (HashMap<String, Object>)testResult.get("overall_result");
                 String labResult = overallHash.get("test").toString();
 
-                //Server logs
-                System.out.println(testResult);
-                for (Map.Entry<String, Object> entry : testResult.entrySet()) {
-                    String key = entry.getKey();
-                    HashMap value = (HashMap)entry.getValue();
-                    System.out.println("Key: " + key + " Values :" + value.toString());
-                }
-
                 //save to DataBase lab results, create student if don't exists in STUDENTS
                 Students student;
-                StudentService studServ = context.getBean(StudentService.class);
                 List<Students> studentRes = studServ.getResultForStudent(studName);
                 if (studentRes.isEmpty()) {
                     student = new Students(studName, group, 0, "failed");
@@ -172,7 +175,6 @@ public class RequestController {
                     student = studentRes.get(0);
                 }
 
-                LabsService labsServ = context.getBean(LabsService.class);
                 List<Labs> labToUpdate = labsServ.getLabForStudent(studName, task);
                 if (labToUpdate.isEmpty()) {
                     Labs labNew = new Labs(task, studName, 1, String.valueOf(0), labResult);
