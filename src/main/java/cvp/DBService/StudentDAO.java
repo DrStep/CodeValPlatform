@@ -31,12 +31,16 @@ public class StudentDAO {
 
     public void updateLabsCompleted(String studName) {
         em.createQuery("update Students s set s.labsCompleted = s.labsCompleted+1  "
-                + "where s.studName = \'" + studName + "\'").executeUpdate();
+                + "where s.studName=:studName")
+                .setParameter("studName", studName)
+                .executeUpdate();
     }
 
     public void updateFinalAssessment(String studName) {
         em.createQuery("update Students s set s.finalAssessment=\'passed\'  "
-                + "where s.studName=\'" + studName + "\'").executeUpdate();
+                + "where s.studName=:studName")
+                .setParameter("studName", studName)
+                .executeUpdate();
     }
 
     public List<Students> getAllStudents() {
@@ -44,10 +48,12 @@ public class StudentDAO {
     }
 
     public List<Students> getStudentsFromGroup(String group) {
-        return em.createQuery("select s from Students s where s.group=\'" + group + "\'", Students.class).getResultList();
+        return em.createQuery("select s from Students s where s.group=:group", Students.class)
+                .setParameter("group", group).getResultList();
     }
 
     public List<Students> getResultForStudent(String student) {
-        return em.createQuery("select s from Students s where s.studName=\'" + student + "\'", Students.class).getResultList();
+        return em.createQuery("select s from Students s where s.studName=:studName", Students.class)
+                .setParameter("studName", student).getResultList();
     }
 }
