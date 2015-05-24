@@ -15,7 +15,7 @@ import java.util.List;
 
 @Repository("labsDAO")
 @Transactional
-public class LabsDAO {
+public class LabsDAO  {
 
     @PersistenceContext
     private EntityManager em;

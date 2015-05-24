@@ -75,8 +75,3 @@ class ArrayGen
     result_map
   end
 end
-
-res = ArrayGen.new(7, 10).gen_tests
-res.each do |key, val|
-  puts "#{key} : #{val}"
-end

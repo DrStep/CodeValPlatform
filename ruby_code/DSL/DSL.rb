@@ -113,6 +113,7 @@ class DSL
   def given(*args)
     # @context : stdin, stdout, stderr, wait_thr
     @context[0].puts(args.join ' ') if args.any?
+    #sleep(0.1)
     @context[0].close
   end
 
@@ -209,4 +210,6 @@ end
 
 # script code
 #test = DSL.new('resources/tasks/arr/', 'ruby_code/DSL/')
-#res = test.run_all
+#for i in 1..20
+#  res = test.run_all
+#end
