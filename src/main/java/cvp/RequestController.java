@@ -131,6 +131,8 @@ public class RequestController {
         HashMap<String, Object> result = new HashMap<>();
         String teach_path = DEFAULT_TEACH_PATH + task + '/';
         String stud_path = DEFAULT_STUD_PATH + group + '/' + studName + '/' + task + '/';
+
+        //save file
         if (!file.isEmpty()) {
             try {
                 byte[] bytes = file.getBytes();
@@ -141,16 +143,10 @@ public class RequestController {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(upload));
                 stream.write(bytes);
                 stream.close();
+                
+                // running DSL for results
                 DSL testOne = new DSL(teach_path, stud_path);
                 HashMap<String, Object> testResult = (HashMap<String,Object>)testOne.run_all();
-
-                //Server logs for ruby code
-                /*System.out.println(testResult);
-                for (Map.Entry<String, Object> entry : testResult.entrySet()) {
-                    String key = entry.getKey();
-                    HashMap value = (HashMap)entry.getValue();
-                    System.out.println("Key: " + key + " Values :" + value.toString());
-                }*/
 
                 LabsService labsServ = context.getBean(LabsService.class);
                 StudentService studServ = context.getBean(StudentService.class);

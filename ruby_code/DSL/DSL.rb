@@ -73,15 +73,21 @@ class DSL
       path = @teach_path
       output_name = "teach_out"
     else
-      files_arr.map! { |file_name| @stud_path + file_name }
-      path = @stud_path
+      path = ""
       output_name = "stud_out"
+      dockerIntr = "docker exec -i test"
+      dockerNonIntr = "docker exec test"
     end
     path_to_exec_file = "#{path}#{output_name}"
     case @lang
     when '.c'
-      cmd[:compile] = "gcc #{files_arr.join(' ')} -o #{path_to_exec_file}"
-      cmd[:run] = "./#{path_to_exec_file}"
+      if teachers
+        cmd[:compile] = "gcc #{files_arr.join(' ')} -o #{path_to_exec_file}"
+        cmd[:run] = "./#{path_to_exec_file}"
+      else
+        cmd[:compile] = "#{dockerNonIntr} gcc #{files_arr.join(' ')} -o #{path_to_exec_file}"
+        cmd[:run] = "#{dockerIntr} ./#{path_to_exec_file}"
+      end
     when '.p'
       cmd[:compile] = "pc #{files_arr.join(' ')}"
       cmd[:run] = "./#{files_arr[0]}"
@@ -113,7 +119,7 @@ class DSL
   def given(*args)
     # @context : stdin, stdout, stderr, wait_thr
     @context[0].puts(args.join ' ') if args.any?
-    #sleep(0.1)
+    sleep(0.3)
     @context[0].close
   end
 
@@ -175,13 +181,28 @@ class DSL
     end
   end
 
+  def removeContainer
+    res = `docker stop test`
+    `docker rm test`
+  end
+
   # function that is called from Java-part for all tests
   def run_all
-    stud_results = run_test stud_cmd
+
     teach_results = run_test teach_cmd
     puts("Teachers one: #{teach_results}")
 
+  #  res = `boot2docker start && eval \"$(boot2docker shellinit)\"`
+    res = `docker run --name test -v #{Dir.pwd}/#{@stud_path}:/home/test -w /home/test -d -t codeval`
+    puts res
+
+    puts "#{Dir.pwd}/#{@stud_path}"
+    stud_results = run_test stud_cmd
+    puts("Students one: #{stud_results}")
+
+
     if stud_results["compile_error"]
+      removeContainer
       return java.util.HashMap.new(stud_results)
     end
 
@@ -203,13 +224,13 @@ class DSL
     else 
       stud_results["overall_result"] =  java.util.HashMap.new({ "test" => "failed" })  
     end
-    puts("Students one: #{stud_results}")
+    removeContainer
     return java.util.HashMap.new(stud_results)
   end
 end
 
-# script code
-#test = DSL.new('resources/tasks/arr/', 'ruby_code/DSL/')
+#script code
+#test = DSL.new('resources/tasks/arr/', '/Users/stepa/IdeaProjects/CodeValPlatform/resources/students/iu6-81/Alexeev/arr/')
 #for i in 1..20
-#  res = test.run_all
+# res = test.run_all
 #end
