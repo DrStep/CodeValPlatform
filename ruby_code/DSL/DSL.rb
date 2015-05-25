@@ -192,9 +192,8 @@ class DSL
     teach_results = run_test teach_cmd
     puts("Teachers one: #{teach_results}")
 
-  #  res = `boot2docker start && eval \"$(boot2docker shellinit)\"`
+    # run docker new container "test"
     res = `docker run --name test -v #{Dir.pwd}/#{@stud_path}:/home/test -w /home/test -d -t codeval`
-    puts res
 
     puts "#{Dir.pwd}/#{@stud_path}"
     stud_results = run_test stud_cmd

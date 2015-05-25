@@ -4,6 +4,7 @@ package cvp;
  * Created by stepa on 26.12.14.
  */
 
+import org.apache.tomcat.jni.Proc;
 import org.jruby.RubyProcess;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -13,9 +14,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 
 @Configuration

@@ -143,7 +143,7 @@ public class RequestController {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(upload));
                 stream.write(bytes);
                 stream.close();
-                
+
                 // running DSL for results
                 DSL testOne = new DSL(teach_path, stud_path);
                 HashMap<String, Object> testResult = (HashMap<String,Object>)testOne.run_all();

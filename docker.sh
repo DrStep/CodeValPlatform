@@ -1,6 +1,7 @@
 #! /bin/bash
 
 boot2docker init
-boot2docker start
+boot2docker up
+boot2docker shellinit
 eval "$(boot2docker shellinit)"
 docker build -t="codeval" .
