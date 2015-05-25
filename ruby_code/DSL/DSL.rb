@@ -193,7 +193,7 @@ class DSL
     puts("Teachers one: #{teach_results}")
 
     # run docker new container "test"
-    res = `docker run --name test -v #{Dir.pwd}/#{@stud_path}:/home/test -w /home/test -d -t codeval`
+    `docker run --name test -v #{Dir.pwd}/#{@stud_path}:/home/test -w /home/test -d -t codeval`
 
     puts "#{Dir.pwd}/#{@stud_path}"
     stud_results = run_test stud_cmd
