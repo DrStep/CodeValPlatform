@@ -8,13 +8,13 @@ import java.util.HashMap;
  */
 public class LabsList {
 
-    private HashMap<String, ArrayList<HashMap>> resultHash;
+    private HashMap<String, ArrayList<HashMap>> labsList;
 
-    public LabsList(HashMap<String, ArrayList<HashMap>> resultHash) {
-        this.resultHash = resultHash;
+    public LabsList(HashMap<String, ArrayList<HashMap>> labsList) {
+        this.labsList = labsList;
     }
 
-    public HashMap<String, ArrayList<HashMap>> getResultHash() {
-        return resultHash;
+    public HashMap<String, ArrayList<HashMap>> getLabsList() {
+        return labsList;
     }
 }

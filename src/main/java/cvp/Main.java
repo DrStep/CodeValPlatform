@@ -21,7 +21,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableAutoConfiguration
 public class Main {
 
-
     public static void main(String[] args) {
 
         //run spring

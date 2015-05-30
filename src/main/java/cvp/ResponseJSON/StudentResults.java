@@ -9,13 +9,13 @@ import java.util.HashMap;
  */
 public class StudentResults {
 
-    private HashMap<String, String> resultHash;
+    private HashMap<String, String> studentRes;
 
-    public StudentResults(HashMap<String, String> resultHash) {
-        this.resultHash = resultHash;
+    public StudentResults(HashMap<String, String> studentRes) {
+        this.studentRes = studentRes;
     }
 
-    public HashMap<String, String> getResultHash() {
-        return resultHash;
+    public HashMap<String, String> getStudentRes() {
+        return studentRes;
     }
 }
