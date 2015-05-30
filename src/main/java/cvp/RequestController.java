@@ -67,7 +67,7 @@ public class RequestController {
         for (Labs iter : labs) {
             HashMap<String, String> oneLabHash =new HashMap<>();
             oneLabHash.put("labName", iter.getLabName());
-            oneLabHash.put("timeDoing", iter.getTime());
+            oneLabHash.put("time", iter.getTime());
             oneLabHash.put("attempts", String.valueOf(iter.getAttempts()));
             oneLabHash.put("test", iter.getTest());
             allLabsArr.add(oneLabHash);
