@@ -75,7 +75,7 @@ class DSL
     else
       path = ""
       output_name = "stud_out"
-      dockerIntr = "docker exec -i test"
+      dockerIntr = "docker exec -i test timeout --version 5s"     # "timeout ..." message ing output if timeout
       dockerNonIntr = "docker exec test"
     end
     path_to_exec_file = "#{path}#{output_name}"
@@ -127,13 +127,22 @@ class DSL
     # @context : stdin, stdout, stderr, wait_thr
     result = {}
     output = @context[1].gets.strip       # with trailing and leading whitespaces removed
+    # timout case handling
+    if /timeout/.match(output)
+      result[:result] = "-"
+      result[:error] = true
+      result[:timeout_error] = true
+      result[:message] = "Overall timeot. Maybe infinitive cycle. \n"
+      return result
+    end
+
     result[:result] = output
     result[:error] = false
     if args.any?
       expected = args.join ' '
       if !output.eql?(expected)
         result[:message] = "Wrong answer! Excpected #{expected}, when the result is #{output} \n"
-        result[:error] = false
+        result[:error] = true
         @pass_expected = false
       end
     end
@@ -153,15 +162,17 @@ class DSL
       start_time = (Time.now.to_f * 1000.0).to_i
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
-      result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time
-      if (result[:taken_time] > @time_lim)
-        time_msg = "Your programm is running too long. #{@time_limit} ms expected and yours - #{result[:taken_time]} \n"
-        if (result[:message])
-          result[:message] += time_msg
-        else
-          result[:message] = time_msg
+      unless result[:timeout_error]
+        result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time
+        if (result[:taken_time] > @time_lim)
+          time_msg = "Your programm is running too long. #{@time_lim} ms expected and yours - #{result[:taken_time]} \n"
+          if (result[:message])
+            result[:message] += time_msg
+          else
+            result[:message] = time_msg
+          end
+          result[:error] = true
         end
-        result[:error] = true
       end
       result[:tests_data] = @generated_tests[name]
       errors = @context[2].gets

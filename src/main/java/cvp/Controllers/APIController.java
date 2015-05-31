@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 public class APIController {
-    
+
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
 
     @RequestMapping("/testDB")
