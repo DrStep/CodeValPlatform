@@ -75,7 +75,7 @@ class DSL
     else
       path = ""
       output_name = "stud_out"
-      dockerIntr = "docker exec -i test timeout --version 5s"     # "timeout ..." message ing output if timeout
+      dockerIntr = "docker exec -i test timeout 15"     # timeout for cycle
       dockerNonIntr = "docker exec test"
     end
     path_to_exec_file = "#{path}#{output_name}"
@@ -119,20 +119,20 @@ class DSL
   def given(*args)
     # @context : stdin, stdout, stderr, wait_thr
     @context[0].puts(args.join ' ') if args.any?
-    sleep(0.3)
+    sleep(0.3)                                      #FOR JRUBY9000 DELETE THIS!!!!!!!!!!!!!!!!!!!!!
     @context[0].close
   end
 
   def expected(*args)
     # @context : stdin, stdout, stderr, wait_thr
     result = {}
-    output = @context[1].gets.strip       # with trailing and leading whitespaces removed
-    # timout case handling
-    if /timeout/.match(output)
+    begin
+      output = @context[1].gets.strip     # with trailing and leading whitespaces removed
+    rescue Exception => e
       result[:result] = "-"
       result[:error] = true
       result[:timeout_error] = true
-      result[:message] = "Overall timeot. Maybe infinitive cycle. \n"
+      result[:message] = "Your console print is empty or overall timeot. Maybe infinitive cycle. \n"
       return result
     end
 
@@ -163,7 +163,7 @@ class DSL
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
       unless result[:timeout_error]
-        result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time
+        result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time - 300   #FOR JRUBY9000 DELETE "-300" PART!!!!!
         if (result[:taken_time] > @time_lim)
           time_msg = "Your programm is running too long. #{@time_lim} ms expected and yours - #{result[:taken_time]} \n"
           if (result[:message])
@@ -206,10 +206,8 @@ class DSL
     # run docker new container "test"
     `docker run --name test -v #{Dir.pwd}/#{@stud_path}:/home/test -w /home/test -d -t codeval`
 
-    puts "#{Dir.pwd}/#{@stud_path}"
     stud_results = run_test stud_cmd
     puts("Students one: #{stud_results}")
-
 
     if stud_results["compile_error"]
       removeContainer

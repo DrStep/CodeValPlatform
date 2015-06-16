@@ -95,7 +95,7 @@ public class CodeAnalyseController {
             }
         } else {
             result.put("error", true);
-            result.put("message", "You failed to upload because the file was empty.");
+            result.put("message", "You failed to upload, because uploaded file was empty.");
         }
         return new CodeRunResults(result);
     }
