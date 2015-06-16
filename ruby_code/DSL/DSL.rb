@@ -28,8 +28,10 @@ class DSL
   attr_reader :pass_expected
   attr_reader :pass_teachers
 
+  attr_writer :timeout_for_inf
 
   def initialize(teachers_path, students_path)
+    @timeout_for_inf = 10
     @test_arr = []
     @teach_cmd = {}
     @stud_cmd = {}
@@ -76,7 +78,7 @@ class DSL
     else
       path = ""
       output_name = "stud_out"
-      dockerIntr = "docker exec -i test timeout 10"     # timeout for cycle
+      dockerIntr = "docker exec -i test timeout #{@timeout_for_inf}"     # timeout for cycle
       dockerNonIntr = "docker exec test"
     end
     path_to_exec_file = "#{path}#{output_name}"
@@ -132,7 +134,7 @@ class DSL
     rescue Exception => e
       result[:result] = "-"
       result[:error] = true
-      result[:message] = "Your console print is empty or overall timeot. Maybe infinitive cycle. \n"
+      result[:message] = "Your console print is empty. \n"
       return result
     end
 
@@ -163,7 +165,9 @@ class DSL
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
       result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time - 300   #FOR JRUBY9000 DELETE "-300" PART!!!!!
-      if (result[:taken_time] > @time_lim)
+      if (result[:taken_time] >= @timeout_for_inf)
+        result[:message] = "Overall timeout. Maybe infinite loop."
+      elsif (result[:taken_time] > @time_lim)
         time_msg = "Your programm is running too long. #{@time_lim} ms expected and yours - #{result[:taken_time]} \n"
         if (result[:message])
           result[:message] += time_msg
