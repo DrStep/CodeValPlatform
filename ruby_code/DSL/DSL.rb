@@ -28,6 +28,7 @@ class DSL
   attr_reader :pass_expected
   attr_reader :pass_teachers
 
+
   def initialize(teachers_path, students_path)
     @test_arr = []
     @teach_cmd = {}
