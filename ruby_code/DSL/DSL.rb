@@ -31,7 +31,7 @@ class DSL
   attr_writer :timeout_for_inf
 
   def initialize(teachers_path, students_path)
-    @timeout_for_inf = 10
+    @timeout_for_inf = 10                 #10 seconds limit, more - infinite loop
     @test_arr = []
     @teach_cmd = {}
     @stud_cmd = {}
@@ -165,7 +165,7 @@ class DSL
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
       result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time - 300   #FOR JRUBY9000 DELETE "-300" PART!!!!!
-      if (result[:taken_time] >= @timeout_for_inf)
+      if (result[:taken_time] >= @timeout_for_inf*1000)         
         result[:message] = "Overall timeout. Maybe infinite loop."
       elsif (result[:taken_time] > @time_lim)
         time_msg = "Your programm is running too long. #{@time_lim} ms expected and yours - #{result[:taken_time]} \n"
