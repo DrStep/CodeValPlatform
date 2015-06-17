@@ -31,6 +31,8 @@ public class CodeAnalyseController {
                                       @RequestParam("student") String studName,@RequestParam("filename")String filename,
                                       @RequestParam("labsCount") int labsCount,@RequestParam("file")MultipartFile file) {
         HashMap<String, Object> result = new HashMap<>();
+        Boolean error = false;
+        String message = "";
         String teach_path = DEFAULT_TEACH_PATH + task + '/';
         String stud_path = DEFAULT_STUD_PATH + group + '/' + studName + '/' + task + '/';
 
@@ -55,9 +57,7 @@ public class CodeAnalyseController {
 
                 if (testResult.get("compile_error") != null) {
                     labsServ.updateLabs(studName, task, "failed");
-                    result.put("error", true);
-                    result.put("message", testResult.get("compile_error"));
-                    return new CodeRunResults(result);
+                    return new CodeRunResults(result, true, (String)testResult.get("compile_error"));
                 }
 
                 HashMap<String, Object> overallHash = (HashMap<String, Object>)testResult.get("overall_result");
@@ -87,17 +87,16 @@ public class CodeAnalyseController {
                 }
 
                 result = testResult;
-                result.put("error", false);
             } catch (Exception e) {
-                System.out.println("Error: " + e.toString());
-                result.put("error", true);
-                result.put("message", "You failed to upload!");
+                System.out.println("Error when testing " + studName + " " + task + " task: " + e.toString());
+                error = true;
+                message = "Failed to test code. Ask your teacher.";
             }
         } else {
-            result.put("error", true);
-            result.put("message", "You failed to upload, because uploaded file was empty.");
+            error = true;
+            message = "Failed to upload, because uploaded file was empty.";
         }
-        return new CodeRunResults(result);
+        return new CodeRunResults(result, error, message);
     }
 
     String DEFAULT_TEACH_PATH = "resources/tasks/";

@@ -8,12 +8,24 @@ import java.util.HashMap;
 public class CodeRunResults {
 
     private HashMap<String, Object> codeRunRes;
+    private Boolean error;
+    private String message;
 
-    public CodeRunResults(HashMap<String, Object> codeRunRes) {
+    public CodeRunResults(HashMap<String, Object> codeRunRes, Boolean error, String message) {
         this.codeRunRes = codeRunRes;
+        this.error = error;
+        this.message = message;
     }
 
     public HashMap<String, Object> getCodeRunRes() {
         return this.codeRunRes;
+    }
+
+    public Boolean getError() {
+        return this.error;
+    }
+
+    public String getMessage() {
+        return this.message;
     }
 }
