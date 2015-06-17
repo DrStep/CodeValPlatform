@@ -86,7 +86,10 @@ public class CodeAnalyseController {
                         labsServ.updateLabs(studName, task, labResult);
                 }
 
-                result = testResult;
+                // Create result structure { test_result: { ... }, overall_result: { ... } }
+                testResult.remove("overall_result");
+                result.put("tests_result", testResult);
+                result.put("overall_result", overallHash);
             } catch (Exception e) {
                 System.out.println("Error when testing " + studName + " " + task + " task: " + e.toString());
                 error = true;
