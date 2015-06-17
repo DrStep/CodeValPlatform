@@ -60,8 +60,7 @@ public class CodeAnalyseController {
                     return new CodeRunResults(result, true, (String)testResult.get("compile_error"));
                 }
 
-                HashMap<String, Object> overallHash = (HashMap<String, Object>)testResult.get("overall_result");
-                String labResult = overallHash.get("test").toString();
+                String labResult = (String)testResult.get("overall_result");
 
                 //save to DataBase lab results, create student if don't exists in STUDENTS
                 Students student;
@@ -89,7 +88,7 @@ public class CodeAnalyseController {
                 // Create result structure { test_result: { ... }, overall_result: { ... } }
                 testResult.remove("overall_result");
                 result.put("tests_result", testResult);
-                result.put("overall_result", overallHash);
+                result.put("overall_result", labResult);
             } catch (Exception e) {
                 System.out.println("Error when testing " + studName + " " + task + " task: " + e.toString());
                 error = true;

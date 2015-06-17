@@ -230,9 +230,9 @@ class DSL
     end
     
     if @pass_teachers && @pass_expected
-      stud_results["overall_result"] =  java.util.HashMap.new({ "test" => "passed" })   
+      stud_results["overall_result"] =  "passed"   
     else 
-      stud_results["overall_result"] =  java.util.HashMap.new({ "test" => "failed" })  
+      stud_results["overall_result"] =  "failed"   
     end
     removeContainer
     return java.util.HashMap.new(stud_results)
