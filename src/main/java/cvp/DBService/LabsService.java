@@ -14,7 +14,7 @@ import java.util.List;
 public class LabsService {
 
     @Autowired
-    LabsDAO labsDAO;
+    private LabsDAO labsDAO;
 
     public Long save(Labs lab) {
         Long id;
