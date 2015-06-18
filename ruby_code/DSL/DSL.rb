@@ -2,7 +2,8 @@ require 'open3'
 require 'java'
 require "#{Dir.pwd}/lib/ArrayGen.jar"
 import Java::ArrayGen
-java_package 'cvp'
+#java_package 'cvp'
+java_package 'DSLLib'
 #require "ruby_code/TestGenerator/ArrayGen"
 
 # Class that implements dsl

@@ -4,7 +4,7 @@ import cvp.DBService.LabsService;
 import cvp.DBService.StudentService;
 import cvp.DBService.tables.Labs;
 import cvp.DBService.tables.Students;
-import cvp.DSL;
+import DSLLib.DSL;
 import cvp.ResponseJSON.CodeRunResults;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.bind.annotation.RequestMapping;
