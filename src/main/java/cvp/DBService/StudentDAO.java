@@ -3,7 +3,6 @@ package cvp.DBService;
 import cvp.DBService.tables.Students;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.yecht.Data;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

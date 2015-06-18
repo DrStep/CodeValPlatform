@@ -1,7 +1,5 @@
 package cvp.ResponseJSON;
 
-import org.yecht.Data;
-
 import java.util.HashMap;
 
 /**

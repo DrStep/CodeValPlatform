@@ -1,7 +1,5 @@
 package cvp.DBService.tables;
 
-import org.yecht.Data;
-
 import javax.persistence.*;
 
 /**

@@ -1,7 +1,6 @@
 package cvp.DBService;
 
 import cvp.DBService.tables.Labs;
-import cvp.DBService.tables.Students;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
