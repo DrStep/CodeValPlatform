@@ -131,7 +131,6 @@ class DSL
   def given(*args)
     # @context : stdin, stdout, stderr, wait_thr
     @context[0].puts(args.join ' ') if args.any?
-    sleep(0.3)                                      #FOR JRUBY9000 DELETE THIS!!!!!!!!!!!!!!!!!!!!!
     @context[0].close
   end
 
@@ -173,7 +172,7 @@ class DSL
       start_time = (Time.now.to_f * 1000.0).to_i
       @context = Open3.popen3("#{cmd[:run]}")
       result = block.call(self)
-      result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time - 300   #FOR JRUBY9000 DELETE "-300" PART!!!!!
+      result[:taken_time] = (Time.now.to_f * 1000.0).to_i - start_time 
       if (result[:taken_time] >= @timeout_for_inf*1000)         
         result[:message] = "Overall timeout. Maybe infinite loop."
       elsif (result[:taken_time] > @time_lim)
