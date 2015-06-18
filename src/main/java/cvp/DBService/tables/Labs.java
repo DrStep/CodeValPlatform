@@ -24,14 +24,14 @@ public class Labs {
     private int attempts;
 
     @Column(name = "TIME")
-    private String time;
+    private Long time;
 
     @Column(name = "TEST")
     private String test;
 
     public Labs() { }
 
-    public Labs(String labName, String studName, int attempts, String time, String test) {
+    public Labs(String labName, String studName, int attempts, Long time, String test) {
         this.labName = labName;
         this.studName = studName;
         this.attempts = attempts;
@@ -71,11 +71,11 @@ public class Labs {
         return attempts;
     }
 
-    public void setTime(String time) {
+    public void setTime(Long time) {
         this.time = time;
     }
 
-    public String getTime() {
+    public Long getTime() {
         return time;
     }
 
