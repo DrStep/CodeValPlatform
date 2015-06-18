@@ -25,27 +25,6 @@ public class APIController {
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-    @RequestMapping("/testDB")
-    public void dbHandler() {
-        //ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        LabsService dao = context.getBean(LabsService.class);
-        Labs one = new Labs("Array", "Petrov", 10, "01:12:31", "passed");
-        Labs two = new Labs("String", "Petrov", 7, "00:07:31", "failed");
-        Labs three = new Labs("Array", "Ivanov", 11, "00:22:01", "passed");
-
-        /*StudentService dao = context.getBean(StudentService.class);
-        Students one = new Students("Petrov", "IU6-81",10, "passed");
-        Students two = new Students("Alexeev", "IU6-81", 7, "failed");
-        Students three = new Students("Ivanov", "IU6-83", 8, "passed");*/
-
-
-        System.out.println("!!!!!");
-        dao.save(one);
-        dao.save(two);
-        dao.save(three);
-
-    }
-
     @RequestMapping(value = "/labs/{student}", method = RequestMethod.GET)
     public LabsList getLabsResults(@PathVariable String student) {
         HashMap<String, ArrayList<HashMap>> resultHash = new HashMap<>();
@@ -117,4 +96,27 @@ public class APIController {
         return new GroupStudents(resultArr);
     }
 
+
+    /*  Part for adding test records to DB
+
+    @RequestMapping("/testDB")
+    public void dbHandler() {
+        //ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        LabsService dao = context.getBean(LabsService.class);
+        Labs one = new Labs("Array", "Petrov", 10, "01:12:31", "passed");
+        Labs two = new Labs("String", "Petrov", 7, "00:07:31", "failed");
+        Labs three = new Labs("Array", "Ivanov", 11, "00:22:01", "passed");
+
+        /*StudentService dao = context.getBean(StudentService.class);
+        Students one = new Students("Petrov", "IU6-81",10, "passed");
+        Students two = new Students("Alexeev", "IU6-81", 7, "failed");
+        Students three = new Students("Ivanov", "IU6-83", 8, "passed");
+
+
+        System.out.println("!!!!!");
+        dao.save(one);
+        dao.save(two);
+        dao.save(three);
+
+    }*/
 }

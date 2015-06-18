@@ -101,6 +101,6 @@ public class CodeAnalyseController {
         return new CodeRunResults(result, error, message);
     }
 
-    String DEFAULT_TEACH_PATH = "resources/tasks/";
-    String DEFAULT_STUD_PATH = "resources/students/";
+    private static final String DEFAULT_TEACH_PATH = "resources/tasks/";
+    private static final String DEFAULT_STUD_PATH = "resources/students/";
 }

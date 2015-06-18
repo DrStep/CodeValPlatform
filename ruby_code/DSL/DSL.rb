@@ -92,10 +92,19 @@ class DSL
         cmd[:run] = "#{dockerIntr} ./#{path_to_exec_file}"
       end
     when '.p'
-      cmd[:compile] = "pc #{files_arr.join(' ')}"
-      cmd[:run] = "./#{files_arr[0]}"
+      if teachers
+        cmd[:compile] = "pc #{files_arr.join(' ')}"
+        cmd[:run] = "./#{files_arr[0]}"
+      else
+        cmd[:compile] = "#{dockerNonIntr} pc #{files_arr.join(' ')}"
+        cmd[:run] = "#{dockerIntr} ./#{files_arr[0]}"
+      end
     when '.rb'
-      cmd[:run] = "ruby #{files_arr[0]}"
+      if teachers
+        cmd[:run] = "#{dockerIntr} ruby #{files_arr[0]}"
+      else 
+        cmd[:run] = "#{dockerIntr} ruby #{files_arr[0]}"
+      end  
     end
     return cmd
   end
