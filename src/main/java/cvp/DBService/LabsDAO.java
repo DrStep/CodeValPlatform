@@ -26,7 +26,7 @@ public class LabsDAO  {
     public Long save(Labs lab) {
         System.out.println("In LabsDAO save");
         em.persist(lab);
-        return lab.getId();
+        return lab.getLabId();
     }
 
     public void updateLabAttempts(String studName, String labName) {

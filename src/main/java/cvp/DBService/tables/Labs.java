@@ -11,13 +11,14 @@ import javax.persistence.*;
 public class Labs {
 
     @Id
+    @Column(name = "LAB_ID")
     @GeneratedValue
-    private Long id;
+    private Long labId;
 
     @Column(name = "LAB")
     private String labName;
 
-    @Column(name = "STUDENT")
+    @Column(name = "STUDENT_NAME")
     private String studName;
 
     @Column(name = "ATTEMPTS")
@@ -29,22 +30,27 @@ public class Labs {
     @Column(name = "TEST")
     private String test;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "STUDENT_ID")
+    private Students student;
+
     public Labs() { }
 
-    public Labs(String labName, String studName, int attempts, Long time, String test) {
+    public Labs(String labName, int attempts, Long time, String test, Students student) {
         this.labName = labName;
-        this.studName = studName;
+        this.studName = student.getStudName();
         this.attempts = attempts;
         this.time = time;
         this.test = test;
+        this.student = student;
     }
 
-    public Long getId() {
-        return id;
+    public Long getLabId() {
+        return labId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLabId(Long labId) {
+        this.labId = labId;
     }
 
     public void setLabName(String name) {
@@ -85,5 +91,13 @@ public class Labs {
 
     public String getTest() {
         return test;
+    }
+
+    public void setStudent(Students student) {
+        this.student = student;
+    }
+
+    public Students getStudent() {
+        return this.student;
     }
 }

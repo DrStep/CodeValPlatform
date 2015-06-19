@@ -39,7 +39,7 @@ public class APIController {
         for (Labs iter : labs) {
             HashMap<String, String> oneLabHash =new HashMap<>();
             oneLabHash.put("labName", iter.getLabName());
-            oneLabHash.put("time", iter.getTime());
+            oneLabHash.put("time", String.valueOf(iter.getTime()));
             oneLabHash.put("attempts", String.valueOf(iter.getAttempts()));
             oneLabHash.put("test", iter.getTest());
             allLabsArr.add(oneLabHash);
@@ -86,7 +86,7 @@ public class APIController {
                 labHash.put("labName", oneLab.getLabName());
                 labHash.put("test", oneLab.getTest());
                 labHash.put("attempts", String.valueOf(oneLab.getAttempts()));
-                labHash.put("time", oneLab.getTime());
+                labHash.put("time", String.valueOf(oneLab.getTime()));
                 labsArr.add(labHash);
             }
             studentResults.put("labs", labsArr);

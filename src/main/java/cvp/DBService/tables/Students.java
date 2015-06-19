@@ -2,6 +2,7 @@ package cvp.DBService.tables;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Created by stepa on 20.05.15.
@@ -12,8 +13,9 @@ import java.io.Serializable;
 public class Students implements Serializable{
 
     @Id
+    @Column(name = "STUDENT_ID")
     @GeneratedValue
-    private Long id;
+    private Long studentId;
 
     @Column(name = "STUDENT")
     private String studName;
@@ -27,6 +29,11 @@ public class Students implements Serializable{
     @Column(name = "FINAL_ASSESSMENT")
     private String finalAssessment;
 
+    @OneToMany(fetch=FetchType.LAZY,
+            mappedBy = "student",
+            cascade = CascadeType.ALL)
+    private Set<Labs> labs;
+
     public Students() { }
 
     public Students(String studName, String group, int labsCompleted, String finalAssessment) {
@@ -36,12 +43,12 @@ public class Students implements Serializable{
         this.finalAssessment = finalAssessment;
     }
 
-    public Long getId() {
-        return id;
+    public Long getStudentId() {
+        return studentId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
     }
 
     public void setStudName(String name) {
@@ -74,5 +81,13 @@ public class Students implements Serializable{
 
     public String getFinalAssessment() {
         return finalAssessment;
+    }
+
+    public void setLabs(Set<Labs> labs) {
+        this.labs = labs;
+    }
+
+    public Set<Labs> getLabs() {
+        return this.labs;
     }
 }

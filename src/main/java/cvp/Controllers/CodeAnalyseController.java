@@ -55,13 +55,6 @@ public class CodeAnalyseController {
                 LabsService labsServ = context.getBean(LabsService.class);
                 StudentService studServ = context.getBean(StudentService.class);
 
-                if (testResult.get("compile_error") != null) {
-                    labsServ.updateLabs(studName, task, "failed");
-                    return new CodeRunResults(result, true, (String)testResult.get("compile_error"));
-                }
-
-                String labResult = (String)testResult.get("overall_result");
-
                 //save to DataBase lab results, create student if don't exists in STUDENTS
                 Students student;
                 List<Students> studentRes = studServ.getResultForStudent(studName);
@@ -72,9 +65,15 @@ public class CodeAnalyseController {
                     student = studentRes.get(0);
                 }
 
+                if (testResult.get("compile_error") != null) {
+                    labsServ.updateLabs(studName, task, "failed");
+                    return new CodeRunResults(result, true, (String)testResult.get("compile_error"));
+                }
+                String labResult = (String)testResult.get("overall_result");
+
                 List<Labs> labToUpdate = labsServ.getLabForStudent(studName, task);
                 if (labToUpdate.isEmpty()) {
-                    Labs labNew = new Labs(task, studName, 1, String.valueOf(0), labResult);
+                    Labs labNew = new Labs(task, 1, Long.valueOf(0), labResult, student);
                     labsServ.save(labNew);
                     if (labResult.equals("passed")) {
                         studServ.updateStudent(studName, student.getLabsCompleted(), labsCount);

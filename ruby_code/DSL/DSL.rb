@@ -203,7 +203,7 @@ class DSL
     end
   end
 
-  def removeContainer
+  def remove_container
     res = `docker stop test`
     `docker rm test`
   end
@@ -221,7 +221,7 @@ class DSL
     puts("Students one: #{stud_results}")
 
     if stud_results["compile_error"]
-      removeContainer
+      remove_container
       return java.util.HashMap.new(stud_results)
     end
 
@@ -243,7 +243,7 @@ class DSL
     else 
       stud_results["overall_result"] =  "failed"   
     end
-    removeContainer
+    remove_container
     return java.util.HashMap.new(stud_results)
   end
 end

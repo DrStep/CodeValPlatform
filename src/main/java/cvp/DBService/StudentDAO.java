@@ -25,7 +25,7 @@ public class StudentDAO {
 
     public Long save(Students student) {
         em.persist(student);
-        return student.getId();
+        return student.getStudentId();
     }
 
     public void updateLabsCompleted(String studName) {
