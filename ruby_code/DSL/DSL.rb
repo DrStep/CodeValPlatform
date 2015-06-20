@@ -138,9 +138,10 @@ class DSL
   def expected(*args)
     # @context : stdin, stdout, stderr, wait_thr
     result = {}
-    begin
-      output = @context[1].gets.strip     # with trailing and leading whitespaces removed
-    rescue Exception => e
+    output = @context[1].gets
+    if !output.nil? && !output.empty?
+      output = output.strip     # with trailing and leading whitespaces removed
+    else
       result[:result] = "-"
       result[:error] = true
       result[:message] = "Your console print is empty. \n"
