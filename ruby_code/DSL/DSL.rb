@@ -92,9 +92,9 @@ class DSL
         cmd[:compile] = "#{dockerNonIntr} gcc #{files_arr.join(' ')} -o #{path_to_exec_file}"
         cmd[:run] = "#{dockerIntr} ./#{path_to_exec_file}"
       end
-    when '.p'
+    when '.pas'
       if teachers
-        cmd[:compile] = "pc #{files_arr.join(' ')}"
+        cmd[:compile] = "fpc #{files_arr.join(' ')}"
         cmd[:run] = "./#{files_arr[0]}"
       else
         cmd[:compile] = "#{dockerNonIntr} pc #{files_arr.join(' ')}"
